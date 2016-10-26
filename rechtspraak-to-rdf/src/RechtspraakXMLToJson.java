@@ -2,10 +2,15 @@ import static org.leibnizcenter.rechtspraak.RechtspraakNlInterface.parseXml;
 import static org.leibnizcenter.rechtspraak.RechtspraakNlInterface.requestXmlForEcli;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.cli.CommandLine;
@@ -16,6 +21,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.leibnizcenter.rechtspraak.CouchInterface;
 
 import generated.OpenRechtspraak;
@@ -27,11 +35,9 @@ public class RechtspraakXMLToJson {
 		Options options = new Options();
 		
 		OptionGroup inputGroup = new OptionGroup();
-		Option input = new Option("i", "input", true, "input file path");
+		Option input = new Option("i", "input", true, "input file path. This can be an xml file, or a directory.");
 		inputGroup.addOption(input);
 		
-		Option ecliStr = new Option("e", "ecli", true, "ECLI identifier");
-		inputGroup.addOption(ecliStr);
 		inputGroup.setRequired(true);
 		options.addOptionGroup(inputGroup);
 		
@@ -52,75 +58,67 @@ public class RechtspraakXMLToJson {
             System.exit(1);
             return;
         }
-		if(cmd.hasOption('e')&&cmd.hasOption('i')){
-			System.out.println("Provide either input file or ECLI identifier, not both.");
-			formatter.printHelp("utility-name", options);
-			System.exit(1);
-            return;
-		}
+
 		
 		//Read the options and call the right functions
-		//Input XML and output path
-		byte[] encodedXML;
+		//Input XML path
 		
-		String outputPath;
-		if(cmd.hasOption('e')){
-			String ecli = cmd.getOptionValue('e');
-			try {
-				encodedXML = requestXmlForEcli(ecli).body().bytes();
-			} catch(Exception e){
-				System.out.println(e.getMessage());
-				System.exit(1);
-	            return;
+		LinkedList<File> inputFiles = new LinkedList<File>();
+		LinkedList<String> outputFilenames = new LinkedList<String>();
+		
+		File inputFile = new File(cmd.getOptionValue('i'));
+		if(inputFile.exists()){
+			if(inputFile.isFile()){
+				inputFiles.add(inputFile);
 			}
-		}
-		else if(cmd.hasOption('i')){
-			try {
-				encodedXML = Files.readAllBytes(Paths.get(cmd.getOptionValue('i')));
-			} catch (IOException e) {
-				System.out.println(e);
-				System.exit(1);
-	            return;
+			else if(inputFile.isDirectory()){
+				//Take all xml files in the directory
+				String[] filenames = inputFile.list(new SuffixFileFilter(".xml"));
+				for(String file : filenames){
+					inputFiles.add(new File(inputFile.getPath(), file));
+				}
 			}
 		}
 		else {
-			System.out.println("Provide either input file or ECLI identifier.");
-			formatter.printHelp("utility-name", options);
-			System.exit(1);
-            return;
+			//TODO wildcards doesn't work
+			String pattern = inputFile.getName();
+			FileFilter fileFilter = new WildcardFileFilter("pattern");
+			File parentFile = inputFile.getParentFile();
+			File[] files = parentFile.listFiles(fileFilter);
+			for(File file : files){
+				inputFiles.add(file);
+			}
+			
 		}
+		
+
 		if(cmd.hasOption('o')){
 			String outputPathValue = cmd.getOptionValue('o');
 			File file = new File(outputPathValue);
 			if(file.isDirectory()){
-				String filename;
-				// If we have an ecli number, we use that as filename:
-				if(cmd.hasOption('i')){
-					filename = new File(cmd.getOptionValue('i')).getName();
-					filename = filename.replaceAll(".xml$", ".json");
+				for(File inputFilename : inputFiles){
+					String filename = inputFilename.getName().replaceAll(".xml$", ".json");
+					String outputPath = new File(outputPathValue, filename).getPath();
+					outputFilenames.add(outputPath);
 				}
-				else {
-					String ecli = cmd.getOptionValue('e');
-					filename = ecli.replaceAll(":", "_")+".json";
-				}
-				outputPath = new File(outputPathValue, filename).getPath();
 			}
 			else {
-				outputPath = cmd.getOptionValue('o');
+				String outputPath = cmd.getOptionValue('o');
+				outputFilenames.add(outputPath);
 			}
 		}
-		else if(cmd.hasOption('i')){
-			String inputPath = cmd.getOptionValue('i');
-			outputPath = inputPath.replaceAll(".xml$", ".json");
-		}
-		else {
-			String ecli = cmd.getOptionValue('e');
-			outputPath = ecli.replaceAll(":", "_")+".json";
+
+		if(inputFiles.size()>outputFilenames.size()){
+			System.out.println("Not enough output paths specified");
+			System.exit(1);
+            return;
 		}
 		
 		//Do the actual conversion
 		try {
-			convertToJson(encodedXML, outputPath);
+			for(int i=0; i<inputFiles.size(); i++){
+				convertToJson(inputFiles.get(i), outputFilenames.get(i));
+			}
 		} catch (JAXBException | IOException e) {
 			System.out.println(e.getMessage());
 			System.exit(1);
@@ -130,7 +128,8 @@ public class RechtspraakXMLToJson {
 
 	}
 	
-	public static void convertToJson(byte[] encodedXML, String outputPath) throws JAXBException, IOException{
+	public static void convertToJson(File inputFile, String outputPath) throws JAXBException, IOException{
+		byte[] encodedXML = Files.readAllBytes(inputFile.toPath());
 		String strXml = new String(encodedXML, "UTF-8");
 		//System.out.println(strXml);
 		OpenRechtspraak doc = parseXml(strXml);
