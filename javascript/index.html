@@ -12,6 +12,11 @@
   stroke-width: 1.5px;
 }
 
+text {
+    font: 10px sans-serif;
+    pointer-events: none;
+}
+
 </style>
 <svg width="960" height="600"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -19,26 +24,45 @@
 
 var svg = d3.select("svg"),
     width = +svg.attr("width"),
-    height = +svg.attr("height");
+    height = +svg.attr("height")
+    radius = 7;
 
 var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 var simulation = d3.forceSimulation()
     //.force("link", d3.forceLink(links).strength(1))
-    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(30))
-    .force("charge", d3.forceManyBody().strength(-5))
+    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+    //    .strength(function(d) {return 1 / Math.min(count(link.source), count(link.target));}))
+    .force("collide", d3.forceCollide(radius))
+    .force("charge", d3.forceManyBody().distanceMin(10).strength(-10))
     .force("x", d3.forceX().strength(0.01))
     .force("y", d3.forceY().strength(0.01))
-    .force("center", d3.forceCenter(width / 2, height / 2));
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    ;
 
 d3.json("network.json", function(error, graph) {
   if (error) throw error;
+
+    svg.append("svg:defs").selectAll("marker")
+        .data(["end"])
+        .enter().append("svg:marker")
+        .attr("id", String)
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", radius*2+6)
+        .attr("refY", -1.5)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto")
+        .append("svg:path")
+        .attr("d", "M0,-5L10,0L0,5");
 
   var link = svg.append("g")
       .attr("class", "links")
     .selectAll("line")
     .data(graph.links)
     .enter().append("line")
+      .attr("marker-end", "url(#end)")
+      .attr("class", "link")
       //.attr("stroke-width", function(d) { return Math.sqrt(d.value); })
       ;
 
@@ -47,15 +71,42 @@ d3.json("network.json", function(error, graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("r", 5)
+      .attr("r", radius)
       .attr("fill", function(d) { return color(d.subject); })
+      .on("mouseover", mouseover)
+      .on("click", onclick)
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
           .on("end", dragended));
 
   node.append("title")
-      .text(function(d) { return d.title; });
+      .text(function(d) { return d.title + "\n" + d.abstract; });
+
+  function mouseover(d) {
+        d3.select(this).append("text")
+            .attr("class", "hover")
+            .attr('transform', function(d){
+                return 'translate(5, -10)';
+            })
+            //.text(function(d){if(d.title != "") {return d.title +"\n" + d.abstract;} else {return d.id;}})
+            .text(d.abstract)
+        ;
+    }
+
+  function onclick(d) {
+      d3.select(this).select("text.hover").remove();
+      d3.select(this).append("text")
+          .attr("class", "hover")
+          .attr('transform', function(d){
+              return 'translate(5, -10)';
+          })
+          .text(d.abstract);
+      console.log(d.abstract);
+      if (d3.event.ctrlKey) {
+          window.open(d.id);
+      }
+    }
 
   simulation
       .nodes(graph.nodes)
@@ -72,8 +123,8 @@ d3.json("network.json", function(error, graph) {
         .attr("y2", function(d) { return d.target.y; });
 
     node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
+        .attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
+        .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
   }
 });
 
