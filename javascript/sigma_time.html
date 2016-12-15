@@ -40,17 +40,14 @@
         },
         settings: {
             minNodeSize: 3,
-            minArrowSize: 7,
+            //minArrowSize: 7,
 //            minEdgeSize: 5,
             //nodesPowRatio: 1
             //autoRescale: false
          //   maxNodeSize: 16
         }
     });
-    forceConfig = {
-        gravity: 1,
-        linLogMode: true
-    }
+
 
     var listener = s.configNoverlap({
         nodeMargin: 5.0,
@@ -66,29 +63,39 @@
         s,
         function() {
             // this below adds x, y attributes as well as size = degree of the node
+
             var i,
                 nodes = s.graph.nodes(),
                 len_n = nodes.length;
-
             for (i = 0; i < len_n; i++) {
-                nodes[i].x = Math.random();
-                nodes[i].y = Math.random();
+                if(nodes[i].date == ""){
+                    var id_split = nodes[i].id.split('=');
+                    var splitted = id_split[id_split.length -1].split(":")
+                    var year = splitted[3]
+                    nodes[i].date = year + "-01-01";
+                }
+            }
+            var dates = nodes.map(function(node){
+                var date = node.date == "" ? new Date(): new Date(node.date);
+                return date.getTime()/1000;});
+            console.log(dates);
+            var dateScale = Math.max(...dates);
+            for (i = 0; i < len_n; i++) {
+                nodes[i].x = dates[i]/dateScale;
+                nodes[i].y = 0;//Math.random();
                 nodes[i].size = 2*s.graph.degree(nodes[i].id);
                 nodes[i].label = nodes[i].title == "" ? nodes[i].id : nodes[i].title;
                 //nodes[i].label = nodes[i].title + '\n' + nodes[i].abstract
                 nodes[i].color = '#000';
+                console.log(nodes[i].date, nodes[i].x);
             }
             s.graph.edges().forEach(function(edge){
-                edge.type = "arrow";
+                edge.type = 'curve';
                 edge.color = '#999';
             });
             s.refresh();
 
-            // ForceAtlas Layout
-            s.startForceAtlas2(forceConfig);
-            setTimeout(function(){
-                s.stopForceAtlas2();
-                s.startNoverlap();}, 10000)
+            //s.startNoverlap();
 
 
         }
