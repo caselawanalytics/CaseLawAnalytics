@@ -1,11 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- START SIGMA IMPORTS -->
-<script src="lib/sigma/sigma.min.js"></script>
-<script src="lib/sigma/plugins/sigma.parsers.json.min.js"></script>
-<script src="lib/sigma/plugins/sigma.layout.forceAtlas2.min.js"></script>
-<script src="lib/sigma/plugins/sigma.layout.noverlap.min.js"></script>
-<script src="lib/sigma/plugins/sigma.plugins.animate.min.js"></script>
+<!--<script src="lib/sigma/sigma.min.js"></script>-->
+<script src="bower_components/sigma/src/sigma.core.js"></script>
+<script src="bower_components/sigma/src/conrad.js"></script>
+<script src="bower_components/sigma/src/utils/sigma.utils.js"></script>
+<script src="bower_components/sigma/src/utils/sigma.polyfills.js"></script>
+<script src="bower_components/sigma/src/sigma.settings.js"></script>
+<script src="bower_components/sigma/src/classes/sigma.classes.dispatcher.js"></script>
+<script src="bower_components/sigma/src/classes/sigma.classes.configurable.js"></script>
+<script src="bower_components/sigma/src/classes/sigma.classes.graph.js"></script>
+<script src="bower_components/sigma/src/classes/sigma.classes.camera.js"></script>
+<script src="bower_components/sigma/src/classes/sigma.classes.quad.js"></script>
+<script src="bower_components/sigma/src/classes/sigma.classes.edgequad.js"></script>
+<script src="bower_components/sigma/src/captors/sigma.captors.mouse.js"></script>
+<script src="bower_components/sigma/src/captors/sigma.captors.touch.js"></script>
+<script src="bower_components/sigma/src/renderers/sigma.renderers.canvas.js"></script>
+<script src="bower_components/sigma/src/renderers/sigma.renderers.webgl.js"></script>
+<script src="bower_components/sigma/src/renderers/sigma.renderers.svg.js"></script>
+<script src="bower_components/sigma/src/renderers/sigma.renderers.def.js"></script>
+<script src="bower_components/sigma/src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="bower_components/sigma/src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="bower_components/sigma/src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="bower_components/sigma/src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="bower_components/sigma/src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="bower_components/sigma/src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="bower_components/sigma/src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="bower_components/sigma/src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="bower_components/sigma/src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="bower_components/sigma/src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="bower_components/sigma/src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="bower_components/sigma/src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="bower_components/sigma/src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="bower_components/sigma/src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="bower_components/sigma/src/misc/sigma.misc.animation.js"></script>
+<script src="bower_components/sigma/src/misc/sigma.misc.bindEvents.js"></script>
+<script src="bower_components/sigma/src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="bower_components/sigma/src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<!--<script src="lib/sigma/plugins/sigma.renderers.edgeLabels.min.js"></script>-->
+<script src="bower_components/sigma/plugins/sigma.renderers.edgeLabels/settings.js"></script>
+<script src="bower_components/sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
+<script src="bower_components/sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
+<script src="bower_components/sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script>
+<script src="bower_components/sigma/plugins/sigma.layout.noverlap/sigma.layout.noverlap.js"></script>
+<script src="bower_components/sigma/plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
+<script src="bower_components/sigma/plugins/sigma.parsers.json/sigma.parsers.json.js"></script>
 <div id="container">
     <style>
         #graph-container {
@@ -25,6 +75,10 @@
         edges: []
     };
 
+    var defaultEdgeColor = '#999';
+    var defaultNodeColor = '#000';
+    var highlightedColor = '#d61913'
+    var grayColor = '#eaeaea'
     // Create new Sigma instance in graph-container div (use your div name here)
     s = new sigma({
         graph: g,
@@ -34,13 +88,14 @@
             type: 'canvas'
         },
         drawingProperties : {
-            //defaultEdgeArrow : 'source',
-            //defaultEdgeType: "arrow",
-            defaultEdgeColor: '#000',
+            defaultEdgeArrow : 'source',
+            defaultEdgeColor: defaultEdgeColor,
+            defaultEdgeType: "curvedArrow",
         },
         settings: {
             minNodeSize: 3,
-            //minArrowSize: 7,
+            drawLabels: false,
+            minArrowSize: 5,
 //            minEdgeSize: 5,
             //nodesPowRatio: 1
             //autoRescale: false
@@ -50,8 +105,10 @@
 
 
     var listener = s.configNoverlap({
-        nodeMargin: 5.0,
-        scaleNodes: 1.3
+        nodeMargin: 0.1,
+        scaleNodes: 1.3,
+        maxIterations: 100,
+        speed: 4
     });
 
     listener.bind('start stop interpolate', function(event) {
@@ -78,33 +135,27 @@
             var dates = nodes.map(function(node){
                 var date = node.date == "" ? new Date(): new Date(node.date);
                 return date.getTime()/1000;});
-            console.log(dates);
             var dateScale = Math.max(...dates);
             for (i = 0; i < len_n; i++) {
                 nodes[i].x = dates[i]/dateScale;
-                nodes[i].y = 0;//Math.random();
+                nodes[i].y = 0; //+ 0.1*Math.random();
                 nodes[i].size = 2*s.graph.degree(nodes[i].id);
                 nodes[i].label = nodes[i].title == "" ? nodes[i].id : nodes[i].title;
                 //nodes[i].label = nodes[i].title + '\n' + nodes[i].abstract
-                nodes[i].color = '#000';
-                console.log(nodes[i].date, nodes[i].x);
+                nodes[i].color = defaultNodeColor;
             }
             s.graph.edges().forEach(function(edge){
-                edge.type = 'curve';
-                edge.color = '#999';
+                edge.type = 'curvedArrow';
+                edge.color = defaultEdgeColor;
             });
             s.refresh();
 
-            //s.startNoverlap();
+            s.startNoverlap();
 
 
         }
     );
 
-    s.bind('clickNode doubleClickNode rightClickNode', function(e) {
-        console.log(e.data);
-        window.open(e.data.node.id);
-    });
 
     s.bind('clickNode doubleClickNode rightClickNode', function(e) {
         console.log(e.data);
@@ -112,9 +163,46 @@
     });
 
     s.bind('overNode', function(e) {
-        console.log(e.data.node.abstract);
+        nodeActive(e.data.node);
     })
 
+    s.bind('outNode', function(e) {
+        resetColors();
+    })
 
+function nodeActive(node) {
+    var outgoingEdges=[], incomingEdges=[], neighbors=[];
+    var id = node.id;
+    var edges = s.renderers[0].edgesOnScreen;
+    edges.forEach(function(edge){
+        //console.log(edge);
+        if (id==edge.source){
+            outgoingEdges.push(edge);
+            console.log("outgoing");
+            edge.color = highlightedColor;
+        }
+        else if (id==edge.target){
+            incomingEdges.push(edge);
+            console.log("incoming");
+            edge.color = highlightedColor;
+        }
+        else {
+            edge.color = grayColor;
+        }
+    });
+    s.refresh();
+}
+
+    function resetColors() {
+        var edges = s.renderers[0].edgesOnScreen;
+        var nodes = s.renderers[0].nodesOnScreen;
+        edges.forEach(function(edge) {
+            edge.color = defaultEdgeColor;
+        });
+        nodes.forEach(function(node) {
+            node.color = defaultNodeColor;
+        });
+        s.refresh();
+    }
 
 </script>
