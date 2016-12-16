@@ -75,10 +75,10 @@
         edges: []
     };
 
-    var defaultEdgeColor = '#999';
-    var defaultNodeColor = '#000';
-    var highlightedColor = '#d61913'
-    var grayColor = '#eaeaea'
+    var defaultEdgeColor = 'rgba(100,100,100,0.5)';
+    var defaultNodeColor = 'rgba(0,0,0,0.7)';//'#000';
+    var highlightedColor = '#d61913';
+    var grayColor = 'rgba(200,200,200,0.5)';
     // Create new Sigma instance in graph-container div (use your div name here)
     s = new sigma({
         graph: g,
@@ -111,8 +111,16 @@
         speed: 4
     });
 
-    listener.bind('start stop interpolate', function(event) {
+    listener.bind('start interpolate', function(event) {
         console.log(event.type);
+    });
+    listener.bind('stop', function(event) {
+        console.log(event.type);
+
+//        s.graph.nodes().forEach(function(node){
+//            node.x = node.xOriginal;
+//        })
+        s.refresh();
     });
 
     sigma.parsers.json(
@@ -137,9 +145,10 @@
                 return date.getTime()/1000;});
             var dateScale = Math.max(...dates);
             for (i = 0; i < len_n; i++) {
+                nodes[i].xOriginal = dates[i]/dateScale;
                 nodes[i].x = dates[i]/dateScale;
-                nodes[i].y = 0; //+ 0.1*Math.random();
-                nodes[i].size = 2*s.graph.degree(nodes[i].id);
+                nodes[i].y = 0 + 0.1*Math.random();
+                nodes[i].size = 2*s.graph.degree(nodes[i].id, "in");
                 nodes[i].label = nodes[i].title == "" ? nodes[i].id : nodes[i].title;
                 //nodes[i].label = nodes[i].title + '\n' + nodes[i].abstract
                 nodes[i].color = defaultNodeColor;
@@ -150,7 +159,7 @@
             });
             s.refresh();
 
-            s.startNoverlap();
+            //s.startNoverlap();
 
 
         }
@@ -171,35 +180,38 @@
     })
 
 function nodeActive(node) {
-    var outgoingEdges=[], incomingEdges=[], neighbors=[];
+    console.log(node);
+    var outgoingEdges=[], incomingEdges=[], neighbors={};
     var id = node.id;
-    var edges = s.renderers[0].edgesOnScreen;
-    edges.forEach(function(edge){
+    s.graph.edges().forEach(function(edge){
         //console.log(edge);
         if (id==edge.source){
             outgoingEdges.push(edge);
-            console.log("outgoing");
+            neighbors[edge.target] = true;
             edge.color = highlightedColor;
         }
         else if (id==edge.target){
             incomingEdges.push(edge);
-            console.log("incoming");
+            neighbors[edge.source] = true;
             edge.color = highlightedColor;
         }
         else {
             edge.color = grayColor;
         }
     });
+    s.graph.nodes().forEach(function(node){
+        if(node.id in neighbors){
+            node.color = highlightedColor;
+        }
+    });
     s.refresh();
 }
 
     function resetColors() {
-        var edges = s.renderers[0].edgesOnScreen;
-        var nodes = s.renderers[0].nodesOnScreen;
-        edges.forEach(function(edge) {
+        s.graph.edges().forEach(function(edge) {
             edge.color = defaultEdgeColor;
         });
-        nodes.forEach(function(node) {
+        s.graph.nodes().forEach(function(node) {
             node.color = defaultNodeColor;
         });
         s.refresh();
