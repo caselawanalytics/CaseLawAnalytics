@@ -123,6 +123,18 @@ def add_type(descriptions, g, ecli_node):
         'resourceIdentifier'])))
     return g
 
+def add_version(descriptions, g, ecli_node):
+    version_list = get_from_descriptions(descriptions, 'dcterms', 'hasVersion')
+    for version in version_list:
+        value = version.attrib.get('resourceIdentifier', None)
+        if value == 'http://psi.rechtspraak.nl/vindplaats':
+            for lis in get_children(version, 'rdf', 'list'):
+                for item in get_children(lis, 'rdf', 'li'):
+                    g.add(
+                        (ecli_node, DCTERMS.hasVersion, rdflib.Literal(item.text)))
+
+    return g
+
 def add_subject(descriptions, g, ecli_node):
     subject_list  = get_from_descriptions(descriptions, 'dcterms', 'subject')
     for s in subject_list:
@@ -166,6 +178,17 @@ def add_uitspraak(element, g, ecli_node):
     return g
 
 
+#TODO
+def add_reference(element, g, ecli_node):
+    reference_list = get_from_descriptions(descriptions, 'dcterms', 'references')
+    for reference in reference_list:
+        uri = reference.attrib.get('bwb:resourceIdentifier', None)
+        dtype = reference.attrib.get('rdfs:label', None)
+        g.add((ecli_node, DCTERMS.reference, rdflib.URIRef(uri)))
+        g.add((rdflib.URIRef(uri), DCTERMS.type, rdflib.Literal(dtype)))
+    return g
+
+
 def parse_xml_element(g, element, ecli):
     rdf = list(element.iterdescendants('{*}RDF'))[0]
     nsmap = rdf.nsmap
@@ -180,6 +203,7 @@ def parse_xml_element(g, element, ecli):
     g = add_subject(descriptions, g, ecli_node)
     g = add_creator(descriptions, g, ecli_node)
     g = add_abstract(element, g, ecli_node)
+    g = add_version(descriptions, g, ecli_node)
     g = add_uitspraak(element, g, ecli_node)
     return g
 
@@ -188,7 +212,7 @@ def parse_and_save(ecli, filepath_input, filepath_output, form='n3'):
     """
     Retrieves the XML document for a specific ECLI identifier,
     parses it and stores it in the specified format.
-    
+
     :param ecli:
     :param filepath_input:
     :param filepath_output:
