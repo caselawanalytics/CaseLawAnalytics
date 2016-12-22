@@ -11,7 +11,7 @@ import re
 from SPARQLWrapper import SPARQLWrapper, JSON
 from rdflib import Graph
 import rdflib
-from rdflib.namespace import DCTERMS
+from rdflib.namespace import DCTERMS, RDFS
 
 ##################################
 # Functions for retrieving metadata
@@ -179,13 +179,29 @@ def add_uitspraak(element, g, ecli_node):
 
 
 #TODO
-def add_reference(element, g, ecli_node):
+def add_one_reference(reference, g, ecli_node):
+    ref_ns = ""
+    resourceIdentifier = ""
+    label = ""
+
+    for k, v in reference.attrib.items():
+        regex = r'\{(.*)\}(.*)'
+        ns, att = re.findall(regex, k)[0]
+        if att == 'resourceIdentifier':
+            ref_ns = ns
+            resourceIdentifier = v
+        if att == 'label':
+            label = v
+    reference_uri = rdflib.URIRef(ref_ns + resourceIdentifier)
+    g.add((ecli_node, DCTERMS.reference, reference_uri))
+    g.add((reference_uri, RDFS.label, rdflib.Literal(label)))
+    g.add((reference_uri, DCTERMS.title, rdflib.Literal(reference.text)))
+    return g
+
+def add_reference(descriptions, g, ecli_node):
     reference_list = get_from_descriptions(descriptions, 'dcterms', 'references')
     for reference in reference_list:
-        uri = reference.attrib.get('bwb:resourceIdentifier', None)
-        dtype = reference.attrib.get('rdfs:label', None)
-        g.add((ecli_node, DCTERMS.reference, rdflib.URIRef(uri)))
-        g.add((rdflib.URIRef(uri), DCTERMS.type, rdflib.Literal(dtype)))
+        add_one_reference(reference, g, ecli_node)
     return g
 
 
@@ -204,6 +220,7 @@ def parse_xml_element(g, element, ecli):
     g = add_creator(descriptions, g, ecli_node)
     g = add_abstract(element, g, ecli_node)
     g = add_version(descriptions, g, ecli_node)
+    g = add_reference(descriptions, g, ecli_node)
     g = add_uitspraak(element, g, ecli_node)
     return g
 
