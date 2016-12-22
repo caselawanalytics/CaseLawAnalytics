@@ -1,17 +1,14 @@
-import static org.leibnizcenter.rechtspraak.RechtspraakNlInterface.parseXml;
-import static org.leibnizcenter.rechtspraak.RechtspraakNlInterface.requestXmlForEcli;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
-import java.util.List;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -23,8 +20,11 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.codehaus.plexus.util.DirectoryScanner;
+import org.leibnizcenter.rechtspraak_importer.model.CouchDoc;
 import org.leibnizcenter.rechtspraak.CouchInterface;
+import org.leibnizcenter.rechtspraak.enricher.Enrich;
+import org.leibnizcenter.xml.NotImplemented;
+import org.xml.sax.SAXException;
 
 import generated.OpenRechtspraak;
 
@@ -119,7 +119,7 @@ public class RechtspraakXMLToJson {
 			for(int i=0; i<inputFiles.size(); i++){
 				convertToJson(inputFiles.get(i), outputFilenames.get(i));
 			}
-		} catch (JAXBException | IOException e) {
+		} catch (JAXBException | IOException | IllegalAccessException | InstantiationException | ClassNotFoundException | TransformerException | URISyntaxException | SAXException | ParserConfigurationException | NotImplemented e) {
 			System.out.println(e.getMessage());
 			System.exit(1);
             return;
@@ -128,14 +128,17 @@ public class RechtspraakXMLToJson {
 
 	}
 	
-	public static void convertToJson(File inputFile, String outputPath) throws JAXBException, IOException{
+	public static void convertToJson(File inputFile, String outputPath) throws JAXBException, IOException, IllegalAccessException, InstantiationException, ClassNotFoundException, TransformerException, URISyntaxException, SAXException, ParserConfigurationException, NotImplemented{
 		byte[] encodedXML = Files.readAllBytes(inputFile.toPath());
 		String strXml = new String(encodedXML, "UTF-8");
 		//System.out.println(strXml);
-		OpenRechtspraak doc = parseXml(strXml);
-
-		String json = CouchInterface.toJson(doc);
-		Files.write(Paths.get(outputPath), json.getBytes());
+		//DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        //Enrich enricher = new Enrich();
+        OpenRechtspraak doc = CouchInterface.parseXml(strXml);
+        CouchDoc couchDoc = new CouchDoc(doc, strXml);
+		String json = CouchInterface.toJson(couchDoc);
+		//Files.write(Paths.get(outputPath), json.getBytes());
+		System.out.println(json);
 		System.out.println("Wrote JSON file to "+outputPath);
 	}
 

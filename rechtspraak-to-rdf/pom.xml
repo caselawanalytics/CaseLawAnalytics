@@ -43,11 +43,6 @@
   		<version>1.8.0</version>
   	</dependency>
   	<dependency>
-  		<groupId>org.leibnizcenter</groupId>
-  		<artifactId>rechtspraak</artifactId>
-  		<version>2.0.2</version>
-  	</dependency>
-  	<dependency>
   		<groupId>xerces</groupId>
   		<artifactId>xercesImpl</artifactId>
   		<version>2.11.0</version>
@@ -66,6 +61,11 @@
   		<groupId>org.codehaus.plexus</groupId>
   		<artifactId>plexus-utils</artifactId>
   		<version>3.0.8</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.leibnizcenter</groupId>
+  		<artifactId>rechtspraak</artifactId>
+  		<version>2.0.4</version>
   	</dependency>
   </dependencies>
 </project>
