@@ -61,8 +61,17 @@
         console.log(event.type);
     });
 
+    var make_node_title = function(node){
+        var label = node.title == "" ? node.id : node.title;
+        var articles = Object.keys(node.articles).join(", ");
+        if(articles.length>0){
+            label = label + " -- " + articles;
+        }
+        return label;
+    };
+    
     sigma.parsers.json(
-        'network_sigma.json',
+        'network_sigma_2.json',
         s,
         function() {
             // this below adds x, y attributes as well as size = degree of the node
@@ -74,8 +83,8 @@
                 nodes[i].x = Math.random();
                 nodes[i].y = Math.random();
                 nodes[i].size = 2*s.graph.degree(nodes[i].id);
-                nodes[i].label = nodes[i].title == "" ? nodes[i].id : nodes[i].title;
-                //nodes[i].label = nodes[i].title + '\n' + nodes[i].abstract
+                //nodes[i].label = nodes[i].title == "" ? nodes[i].id : nodes[i].title;
+                nodes[i].label = make_node_title(nodes[i]);
                 nodes[i].color = '#000';
             }
             s.graph.edges().forEach(function(edge){
@@ -105,7 +114,7 @@
     });
 
     s.bind('overNode', function(e) {
-        console.log(e.data.node.abstract);
+        console.log(e.data.node);
     })
 
 
