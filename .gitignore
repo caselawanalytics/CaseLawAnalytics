@@ -1,3 +1,5 @@
 *.db
 blazegraph.jnl
 javascript/.idea/*
+blazegraph_querier/__pycache__
+parser/__pycache__
