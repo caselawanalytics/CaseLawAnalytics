@@ -11,6 +11,7 @@ import re
 from SPARQLWrapper import SPARQLWrapper, JSON
 from rdflib import Graph
 import rdflib
+import urllib.parse
 from rdflib.namespace import DCTERMS, RDFS
 
 ##################################
@@ -192,7 +193,8 @@ def add_one_reference(reference, g, ecli_node):
             resourceIdentifier = v
         if att == 'label':
             label = v
-    reference_uri = rdflib.URIRef(ref_ns + resourceIdentifier)
+    ref_uri_str = urllib.parse.quote(ref_ns + resourceIdentifier, safe=';/?:@&=+$,')
+    reference_uri = rdflib.URIRef(ref_uri_str)
     g.add((ecli_node, DCTERMS.reference, reference_uri))
     g.add((reference_uri, RDFS.label, rdflib.Literal(label)))
     g.add((reference_uri, DCTERMS.title, rdflib.Literal(reference.text)))
