@@ -8,6 +8,9 @@ import json
 DEFAULT_SPARQL_ENDPOINT = "http://localhost:9999/blazegraph/namespace/hogeraad/sparql"
 
 def retrieve_from_sparql(searchstring, sparql):
+    # escape quotes in searchstring
+    searchstring = searchstring.replace('"', '\\"')
+
     query_nodesandrefs = '''prefix dcterm: <http://purl.org/dc/terms/>
     prefix bds: <http://www.bigdata.com/rdf/search#>
     select ?type ?id ?to ?title ?creator ?date ?subject ?abstract
@@ -85,7 +88,6 @@ def query(searchstring, only_linked=True, sparql=None):
     if sparql is None:
         sparql = SPARQLWrapper(DEFAULT_SPARQL_ENDPOINT)
 
-    #TODO: check for sparql injection?
     nodes_and_links = retrieve_from_sparql(searchstring, sparql)
 
     # Parse the nodes
