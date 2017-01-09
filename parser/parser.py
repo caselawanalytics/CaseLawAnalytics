@@ -100,7 +100,7 @@ def get_identifier(descriptions, ecli):
             identifier = identifier_list[0].text
             ecli_node = rdflib.URIRef(identifier)
     if ecli_node is None:
-        ecli_node = rdflib.URIRef("http://deeplink.rechtspraak.nl/uitspraak?"+ecli)
+        ecli_node = rdflib.URIRef("http://deeplink.rechtspraak.nl/uitspraak?id="+ecli)
     return ecli_node
 
 def add_title(descriptions, g, ecli_node):
