@@ -105,14 +105,22 @@
             s.refresh();
 
             // ForceAtlas Layout
-            s.startForceAtlas2(forceConfig);
-            setTimeout(function(){
+            layOutGraph();
+    }
+    
+    var layOutGraph = function(){
+        console.log('Starting layout');
+        s.startForceAtlas2(forceConfig);
+        setTimeout(
+            function(){
                 s.stopForceAtlas2();
-                s.startNoverlap();}, 10000)
+                s.startNoverlap();
+            }, 
+            10000)
     }
     
     sigma.parsers.json(
-        'network_sigma.json',
+        'wgaans.json',
         s,
         onLoad
     );
@@ -120,14 +128,15 @@
     var onNewDataEvent = function(e) {
         var filetxt = e.target.result;
         var newdata = JSON.parse(filetxt);
+        s.killForceAtlas2();
         s.graph.clear();
+        s.refresh();
         s.graph.read(newdata);
-
+        s.refresh();
         onLoad();
         s.refresh();
     };
     
-    //document.getElementById('json-file').addEventListener('change', loadData, false);
     
     var loadData = function(){
         console.log('Loading data...');
