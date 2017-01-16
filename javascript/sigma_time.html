@@ -65,9 +65,17 @@
             right: 0;
             position: absolute;
         }
+        #input-form {
+            position: relative;
+        }
     </style>
     <div id="graph-container"></div>
-    <div id="attribute-pane"></div>
+    <div id="attribute-pane"></div>    
+    <div id="input-form">
+        <form enctype="multipart/form-data" method="post">
+            <input id="json-file" type="file" onchange="loadData()"/>
+        </form>
+    </div>
 </div>
 <script>
     var g = {
@@ -123,10 +131,7 @@
         s.refresh();
     });
 
-    sigma.parsers.json(
-        'network_sigma.json',
-        s,
-        function() {
+    var onLoad = function(){
             // this below adds x, y attributes as well as size = degree of the node
 
             var i,
@@ -163,8 +168,36 @@
 
 
         }
+    
+    sigma.parsers.json(
+        'network_sigma.json',
+        s,
+        onLoad 
     );
 
+        
+    var onNewDataEvent = function(e) {
+        var filetxt = e.target.result;
+        var newdata = JSON.parse(filetxt);
+        s.graph.clear();
+        s.graph.read(newdata);
+
+        onLoad();
+        s.refresh();
+    };
+    
+    
+    var loadData = function(){
+        console.log('Loading data...');
+        if(document.getElementById("json-file")) {
+            var jsonfile = document.getElementById("json-file").files[0];
+            var fileReader = new FileReader();
+            fileReader.onload = onNewDataEvent;
+            fileReader.readAsText(jsonfile);
+
+
+        }
+    };
 
     s.bind('clickNode doubleClickNode rightClickNode', function(e) {
         console.log(e.data);
