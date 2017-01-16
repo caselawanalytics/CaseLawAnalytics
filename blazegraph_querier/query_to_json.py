@@ -13,11 +13,12 @@ def retrieve_from_sparql(searchstring, sparql):
 
     query_nodesandrefs = '''prefix dcterm: <http://purl.org/dc/terms/>
     prefix bds: <http://www.bigdata.com/rdf/search#>
-    select ?type ?id ?to ?title ?creator ?date ?subject ?abstract
+    select ?type ?id ?to ?title ?creator ?date ?subject ?abstract ?hasVersion
     with {
      	select ?id
     	where {
           ?o bds:search "''' + searchstring + '''" .
+          ?o bds:matchAllTerms "true" .
           ?id ?p ?o .
           ?id dcterm:type	<http://psi.rechtspraak.nl/uitspraak>.
          }
@@ -39,6 +40,58 @@ def retrieve_from_sparql(searchstring, sparql):
        optional { ?id dcterm:date ?date}.
        optional { ?id dcterm:title ?title}
       }
+      union
+      {
+        BIND("vindplaats" AS ?type).
+        ?id dcterm:hasVersion ?hasVersion
+        include %matcheddocs
+        }
+    }
+    '''
+    sparql.setQuery(query_nodesandrefs)
+    sparql.setReturnFormat(JSON)
+    ret = sparql.query()
+    nodes_and_links = ret.convert()
+    return nodes_and_links
+
+def retrieve_predicate_object(pred, obj, sparql):
+    # escape quotes in searchstring
+    pred = pred.replace('"', '\\"')
+    obj = obj.replace('"', '\\"')
+
+    query_nodesandrefs = '''prefix dcterm: <http://purl.org/dc/terms/>
+    prefix bds: <http://www.bigdata.com/rdf/search#>
+    select ?type ?id ?to ?title ?creator ?date ?subject ?abstract ?hasVersion
+    with {
+     	select ?id
+    	where {
+          ?id  ''' + pred + ' ' + obj + ''' .
+          ?id dcterm:type	<http://psi.rechtspraak.nl/uitspraak>.
+         }
+    } as %matcheddocs
+    where {
+      {
+        BIND("link" AS ?type).
+        ?id dcterm:references ?to.
+        include %matcheddocs
+      }
+       union
+        {
+        include %matcheddocs
+        BIND("node" AS ?type).
+       ?id dcterm:type	<http://psi.rechtspraak.nl/uitspraak>.
+           optional { ?id dcterm:creator ?creator}.
+       optional { ?id dcterm:abstract ?abstract}.
+       optional { ?id dcterm:subject ?subject}.
+       optional { ?id dcterm:date ?date}.
+       optional { ?id dcterm:title ?title}
+      }
+      union
+      {
+        BIND("vindplaats" AS ?type).
+        ?id dcterm:hasVersion ?hasVersion
+        include %matcheddocs
+        }
     }
     '''
     sparql.setQuery(query_nodesandrefs)
@@ -61,11 +114,24 @@ def parse_nodes(nodes_in, variables):
     return nodes_json, unique_ids
 
 
-def enrich_nodes(nodes):
+def enrich_nodes(nodes, vindplaatsen):
     for node in nodes:
         articles = matcher.get_articles(node['abstract'])
         node['articles'] = {art + ' ' + book: cnt for (art, book), cnt in
                             articles.items()}
+
+    count_version = {}
+    count_annotation = {}
+    for item in vindplaatsen:
+        id0 = item['id']['value']
+        val = item['hasVersion']['value']
+        count_version[id0] = count_version.get(id0, 0) + 1
+        if val.lower().find('met annotatie') >= 0:
+            count_annotation[id0] = count_annotation.get(id0, 0) + 1
+    for node in nodes:
+        node['count_version'] = count_version.get(node['id'], 0)
+        node['count_annotation'] = count_annotation.get(node['id'], 0)
+
     return nodes
 
 
@@ -84,19 +150,25 @@ def parse_links(links_in, node_ids):
     return links_json
 
 
-def query(searchstring, only_linked=True, sparql=None):
+def query(searchstring, only_linked=True, sparql=None, pred=None, obj=None):
     if sparql is None:
         sparql = SPARQLWrapper(DEFAULT_SPARQL_ENDPOINT)
 
-    nodes_and_links = retrieve_from_sparql(searchstring, sparql)
+    if searchstring is None:
+        nodes_and_links = retrieve_predicate_object(pred, obj,
+                                                                  sparql)
+    else:
+        nodes_and_links = retrieve_from_sparql(searchstring, sparql)
 
     # Parse the nodes
     variables = [x for x in nodes_and_links['head']['vars'] if
-                 x not in ['type', 'from', 'to']]
+                 x not in ['type', 'from', 'to', 'hasVersion']]
     nodes = [res for res in nodes_and_links['results']['bindings'] if
              res['type']['value'] == 'node']
+    vindplaatsen = [res for res in nodes_and_links['results']['bindings'] if
+                    res['type']['value'] == 'vindplaats']
     nodes_json, node_ids = parse_nodes(nodes, variables)
-    nodes_json = enrich_nodes(nodes_json)
+    nodes_json = enrich_nodes(nodes_json, vindplaatsen)
 
     # Parse the links
     links = [res for res in nodes_and_links['results']['bindings'] if
@@ -121,4 +193,4 @@ def to_d3_json(nodes, links, filename):
 
 def to_sigma_json(nodes, links, filename):
     with open(filename, 'w') as outfile:
-        json.dump({'nodes': nodes_json, 'edges': references}, fp=outfile)
+        json.dump({'nodes': nodes, 'edges': links}, fp=outfile)
