@@ -3,7 +3,9 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 import parser.matcher as matcher
+from . import network_analysis
 import json
+import itertools
 
 DEFAULT_SPARQL_ENDPOINT = "http://localhost:9999/blazegraph/namespace/hogeraad/sparql"
 
@@ -13,7 +15,7 @@ def retrieve_from_sparql(searchstring, sparql):
 
     query_nodesandrefs = '''prefix dcterm: <http://purl.org/dc/terms/>
     prefix bds: <http://www.bigdata.com/rdf/search#>
-    select ?type ?id ?to ?title ?creator ?date ?subject ?abstract ?hasVersion
+    select ?type ?id ?to ?title ?creator ?date ?subject ?abstract ?hasVersion ?article
     with {
      	select ?id
     	where {
@@ -46,6 +48,14 @@ def retrieve_from_sparql(searchstring, sparql):
         ?id dcterm:hasVersion ?hasVersion
         include %matcheddocs
         }
+      union
+      {
+        include %matcheddocs
+        BIND("article" AS ?type).
+        ?id dcterm:reference ?articleid .
+        ?articleid rdfs:label "Wetsverwijzing".
+        ?articleid dcterm:title ?article
+      }
     }
     '''
     sparql.setQuery(query_nodesandrefs)
@@ -61,7 +71,7 @@ def retrieve_predicate_object(pred, obj, sparql):
 
     query_nodesandrefs = '''prefix dcterm: <http://purl.org/dc/terms/>
     prefix bds: <http://www.bigdata.com/rdf/search#>
-    select ?type ?id ?to ?title ?creator ?date ?subject ?abstract ?hasVersion
+    select ?type ?id ?to ?title ?creator ?date ?subject ?abstract ?hasVersion ?article
     with {
      	select ?id
     	where {
@@ -92,6 +102,14 @@ def retrieve_predicate_object(pred, obj, sparql):
         ?id dcterm:hasVersion ?hasVersion
         include %matcheddocs
         }
+    union
+      {
+        include %matcheddocs
+        BIND("article" AS ?type).
+        ?id dcterm:reference ?articleid .
+        ?articleid rdfs:label "Wetsverwijzing".
+        ?articleid dcterm:title ?article
+      }
     }
     '''
     sparql.setQuery(query_nodesandrefs)
@@ -114,11 +132,33 @@ def parse_nodes(nodes_in, variables):
     return nodes_json, unique_ids
 
 
-def enrich_nodes(nodes, vindplaatsen):
+def url_to_ecli(url):
+    ecli = url.split('=')[-1]
+    return ecli
+
+def ecli_to_year(ecli):
+    return int(ecli.split(':')[3])
+
+
+def enrich_nodes(nodes, vindplaatsen, articles):
+    """
+    Add some attributes to the nodes.
+
+    :param nodes:
+    :param vindplaatsen:
+    :return:
+    """
     for node in nodes:
-        articles = matcher.get_articles(node['abstract'])
-        node['articles'] = {art + ' ' + book: cnt for (art, book), cnt in
-                            articles.items()}
+        matched_articles = matcher.get_articles(node['abstract'])
+        node['articles'] = [art + ' ' + book for (art, book), cnt in
+                            matched_articles.items()]
+        node['ecli'] = url_to_ecli(node['id'])
+        node['year'] = ecli_to_year(node['ecli'])
+
+    # get the keys (case id) and value (article name)
+    articles_kv = [(item['id']['value'], item['article']['value']) for item in articles]
+    articles_grouped = itertools.groupby(articles_kv, lambda x: x[0])
+    articles_dict = {k: list(set([val[1] for val in g])) for k,g in articles_grouped}
 
     count_version = {}
     count_annotation = {}
@@ -128,9 +168,11 @@ def enrich_nodes(nodes, vindplaatsen):
         count_version[id0] = count_version.get(id0, 0) + 1
         if val.lower().find('met annotatie') >= 0:
             count_annotation[id0] = count_annotation.get(id0, 0) + 1
+
     for node in nodes:
         node['count_version'] = count_version.get(node['id'], 0)
         node['count_annotation'] = count_annotation.get(node['id'], 0)
+        node['articles'] = node['articles'] + articles_dict.get(node['id'], [])
 
     return nodes
 
@@ -162,18 +204,24 @@ def query(searchstring, only_linked=True, sparql=None, pred=None, obj=None):
 
     # Parse the nodes
     variables = [x for x in nodes_and_links['head']['vars'] if
-                 x not in ['type', 'from', 'to', 'hasVersion']]
+                 x not in ['type', 'from', 'to', 'hasVersion', 'article']]
     nodes = [res for res in nodes_and_links['results']['bindings'] if
              res['type']['value'] == 'node']
     vindplaatsen = [res for res in nodes_and_links['results']['bindings'] if
                     res['type']['value'] == 'vindplaats']
+    articles = [res for res in nodes_and_links['results']['bindings'] if
+                    res['type']['value'] == 'article']
     nodes_json, node_ids = parse_nodes(nodes, variables)
-    nodes_json = enrich_nodes(nodes_json, vindplaatsen)
+
+    nodes_json = enrich_nodes(nodes_json, vindplaatsen, articles)
 
     # Parse the links
     links = [res for res in nodes_and_links['results']['bindings'] if
              res['type']['value'] == 'link']
     links_json = parse_links(links, node_ids)
+
+    # Add network analysis
+    nodes_json = network_analysis.add_network_statistics(nodes_json, links_json)
 
     # Possibly: remove nodes without link
     if only_linked:
@@ -194,3 +242,12 @@ def to_d3_json(nodes, links, filename):
 def to_sigma_json(nodes, links, filename):
     with open(filename, 'w') as outfile:
         json.dump({'nodes': nodes, 'edges': links}, fp=outfile)
+
+def to_csv(nodes, filename, variables=None):
+    import pandas as pd
+    if len(nodes) == 0:
+        raise Exception("List of nodes should not be empty!")
+    if variables is None:
+        variables  = nodes[0].keys()
+    df = pd.DataFrame(nodes).set_index('id')
+    df.to_csv(filename)
