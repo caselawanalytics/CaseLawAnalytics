@@ -192,6 +192,7 @@ def parse_links(links_in, node_ids):
     return links_json
 
 
+
 def query(searchstring, only_linked=True, sparql=None, pred=None, obj=None):
     if sparql is None:
         sparql = SPARQLWrapper(DEFAULT_SPARQL_ENDPOINT)
