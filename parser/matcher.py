@@ -48,3 +48,19 @@ def get_articles(text):
     for (art_number, art_name), cnt in Counter(articles).most_common():
         result[(art_number, art_name)] = cnt
     return result
+
+def get_ecli_references(text):
+    """
+
+    :param text:
+    :return:
+    """
+    ecli_regex =  r'''ECLI:[A-Z]{2}:[A-Z]+:[0-9]{4}:[A-Z0-9]+'''
+
+    references = re.findall(ecli_regex, text)
+
+    result = {}
+    # Aggregate with counter
+    for ecli, cnt in Counter(references).most_common():
+        result[ecli] = cnt
+    return result

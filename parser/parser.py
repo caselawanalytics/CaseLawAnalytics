@@ -55,8 +55,6 @@ def retrieve_from_filesystem(ecli, rootpath):
     try:
         return etree.ElementTree().parse(path)
     except Exception as e:
-        print('Exception: ', path)
-        print(e)
         return None
 
 def retrieve_from_any(ecli, rootpath):
@@ -73,7 +71,6 @@ def retrieve_from_any(ecli, rootpath):
         try:
             el = retrieve_from_web(ecli)
         except Exception as e:
-            print('Exception: ', e)
             el = None
     return el
 
@@ -195,7 +192,7 @@ def add_one_reference(reference, g, ecli_node):
             label = v
     ref_uri_str = urllib.parse.quote(ref_ns + resourceIdentifier, safe=';/?:@&=+$,')
     reference_uri = rdflib.URIRef(ref_uri_str)
-    g.add((ecli_node, DCTERMS.reference, reference_uri))
+    g.add((ecli_node, DCTERMS.references, reference_uri))
     g.add((reference_uri, RDFS.label, rdflib.Literal(label)))
     g.add((reference_uri, DCTERMS.title, rdflib.Literal(reference.text)))
     return g
@@ -272,3 +269,10 @@ def parse_data_in_batches(filepath_input, filepath_output,
                 upload_to_sparql(fname)
             else:
                 print("Could not parse", ecli)
+
+if __name__ == "__main__":
+    import sys
+    filepath_input = sys.argv[0]
+    filepath_output = sys.argv[1]
+    parse_data_in_batches(filepath_input, filepath_output,
+                                 nrdocs=30000, batchsize=1000)
