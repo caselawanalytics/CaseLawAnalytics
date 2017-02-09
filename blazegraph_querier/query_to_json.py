@@ -240,15 +240,21 @@ def to_d3_json(nodes, links, filename):
         json.dump({'nodes': nodes, 'links': links}, fp=outfile)
 
 
-def to_sigma_json(nodes, links, filename):
+def to_sigma_json(nodes, links, title, filename=None):
+    if filename is None:
+        return json.dumps({'title': title, 'nodes': nodes, 'edges': links})
     with open(filename, 'w') as outfile:
-        json.dump({'nodes': nodes, 'edges': links}, fp=outfile)
+        json.dump({'title': title, 'nodes': nodes, 'edges': links}, fp=outfile)
 
-def to_csv(nodes, filename, variables=None):
+def to_csv(nodes, filename=None, variables=None):
     import pandas as pd
     if len(nodes) == 0:
-        raise Exception("List of nodes should not be empty!")
-    if variables is None:
-        variables  = nodes[0].keys()
-    df = pd.DataFrame(nodes).set_index('id')
-    df.to_csv(filename)
+        df = pd.DataFrame()
+    else:
+        if variables is None:
+            variables  = nodes[0].keys()
+        df = pd.DataFrame(nodes).set_index('id')
+    if filename is None:
+        return df.to_csv()
+    else:
+        df.to_csv(filename)

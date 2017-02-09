@@ -1,19 +1,22 @@
 import networkx as nx
 from networkx.readwrite import json_graph
 
-def get_network(nodes, edges):
+def get_network(nodes, links):
+    edges = []
     node_indices = {nodes[i]['id']: i for i in range(len(nodes))}
-    for edge in edges:
-        edge['source'] = node_indices[edge['source']]
-        edge['target'] = node_indices[edge['target']]
-
+    for link in links:
+        edge = {}
+        edge['source'] = node_indices[link['source']]
+        edge['target'] = node_indices[link['target']]
+        edge['id'] = link['id']
+        edges.append(edge)
     graph = json_graph.node_link_graph({'nodes': nodes, 'links': edges},
                                        directed=True, multigraph=False)
     return graph
 
 
-def add_network_statistics(nodes, edges):
-    graph = get_network(nodes, edges)
+def add_network_statistics(nodes, links):
+    graph = get_network(nodes, links)
     hubs, authorities = nx.hits(graph)
     statistics = {
         'degree': nx.degree(graph),

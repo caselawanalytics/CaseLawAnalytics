@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Case Law Querier</title>
+</head>
+<body>
+    <h1>Case Law Querier</h1>
+    <div class="formpage">
+          {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
+        <form action="{{ url_for('query') }}" method="post">
+            <dl>
+              <dt>Keyword:
+              <dd><input type="text" name="keyword">
+              <dt>Only cases with links::
+              <dd><input type="checkbox" name="only_linked">
+              <dd><input type="submit" value="Search">
+            </dl>
+          </form>
+
+        {% if network_json %}<textarea  rows="10" cols="50" class="network_output"> {{ network_json }}</textarea>{% endif %}
+        {% if network_csv %}<textarea  rows="10" cols="50" class="network_output"> {{ network_csv }}</textarea>{% endif %}
+    </div>
+</body>
+</html>
