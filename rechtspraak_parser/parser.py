@@ -8,71 +8,12 @@ TODO: handle exceptions better
 import os
 from lxml import etree
 import re
-from SPARQLWrapper import SPARQLWrapper, JSON
 from rdflib import Graph
 import rdflib
 import urllib.parse
 from rdflib.namespace import DCTERMS, RDFS
 
-##################################
-# Functions for retrieving metadata
-##################################
-def get_entries_from_link(fr=0, \
-                          maximum=1000, \
-                          baselink=None):
-    """
-    Retrieves the 'entry' elements of an xml file on the web.
-    TODO: now standard selects Hoge Raad and return=Doc
 
-    :param fr:
-    :param maximum:
-    :param baselink:
-    :return:
-    """
-    if baselink is None:
-        baselink = 'http://data.rechtspraak.nl/uitspraken/zoeken?return=DOC&creator=http://standaarden.overheid.nl/owms/terms/Hoge_Raad_der_Nederlanden'
-    link = baselink + '&max=' + str(maximum) + '&from=' + str(fr)
-    xml_element = etree.ElementTree().parse(link)
-    entries = list(xml_element.iter('{*}entry'))
-    return entries
-
-def get_first_content(el, tag):
-    return list(el.iter('{*}'+tag))[0].text
-
-
-##################################
-# Functions for retrieving complete xml documents
-##################################
-def retrieve_from_web(ecli):
-    link = 'http://data.rechtspraak.nl/uitspraken/content?id=' + ecli
-    return etree.ElementTree().parse(link)
-
-
-def retrieve_from_filesystem(ecli, rootpath):
-    year = ecli[11:15]
-    fn = str(year) + '/' + re.sub(':', '_', ecli) + '.xml'
-    path = os.path.join(rootpath, fn)
-    try:
-        return etree.ElementTree().parse(path)
-    except Exception as e:
-        return None
-
-def retrieve_from_any(ecli, rootpath):
-    """
-    Checks if it can find the xml document in the filesystem,
-    otherwise retrieves it from the web.
-
-    :param ecli:
-    :param rootpath:
-    :return:
-    """
-    el = retrieve_from_filesystem(ecli, rootpath)
-    if el is None:
-        try:
-            el = retrieve_from_web(ecli)
-        except Exception as e:
-            el = None
-    return el
 
 
 ##################################
@@ -204,7 +145,8 @@ def add_reference(descriptions, g, ecli_node):
     return g
 
 
-def parse_xml_element(g, element, ecli):
+def parse_xml_element(element, ecli):
+    g = Graph()
     rdf = list(element.iterdescendants('{*}RDF'))[0]
     nsmap = rdf.nsmap
     for k, v in nsmap.items():
@@ -224,55 +166,3 @@ def parse_xml_element(g, element, ecli):
     return g
 
 
-def parse_and_save(ecli, filepath_input, filepath_output, form='n3'):
-    """
-    Retrieves the XML document for a specific ECLI identifier,
-    parses it and stores it in the specified format.
-
-    :param ecli:
-    :param filepath_input:
-    :param filepath_output:
-    :param form:
-    :return:
-    """
-    g = Graph()
-    element = retrieve_from_any(ecli, filepath_input)
-    if element is None:
-        return None
-    g = parse_xml_element(g, element, ecli)
-    ext = '.ttl' if form=='turtle' else '.'+form
-    fname = os.path.join(filepath_output, re.sub(':', '_', ecli)+ext)
-    g.serialize(destination=fname, format=form)
-    return fname
-
-
-
-##################################
-# Functions for processing many eclis
-##################################
-def upload_to_sparql(fname, namespace='hogeraad'):
-    sparql = SPARQLWrapper("http://localhost:9999/blazegraph/namespace/{}/sparql".format(namespace))
-    sparql.method = 'POST'
-    sparql.setQuery('LOAD <file://{}>'.format(fname))
-    res = sparql.query()
-
-def parse_data_in_batches(filepath_input, filepath_output,
-                          nrdocs=30000, batchsize=1000):
-    for start in range(0, nrdocs, batchsize):
-        entries = get_entries_from_link(start, batchsize)
-        print(start, len(entries))
-        for entry in entries:
-            ecli = get_first_content(entry, 'id')
-            fname = parse_and_save(ecli, filepath_input, filepath_output,
-                                   form='n3')
-            if fname is not None:
-                upload_to_sparql(fname)
-            else:
-                print("Could not parse", ecli)
-
-if __name__ == "__main__":
-    import sys
-    filepath_input = sys.argv[0]
-    filepath_output = sys.argv[1]
-    parse_data_in_batches(filepath_input, filepath_output,
-                                 nrdocs=30000, batchsize=1000)
