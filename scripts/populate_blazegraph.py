@@ -10,7 +10,7 @@ b : batch size
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 from rechtspraak_parser import populate_blazegraph
 
 if __name__ == "__main__":
@@ -23,6 +23,8 @@ if __name__ == "__main__":
     filepath_output = args[1]
     nrdocs = int(optdict.get('-n', 30000))
     batchsize = int(optdict.get('-b', 1000))
-    print(filepath_input, filepath_output, nrdocs, batchsize)
+    print("Reading from: ", filepath_input)
+    print("Writing n3 files to: ", filepath_output)
+    print(nrdocs, "documents, batch size of ", batchsize)
     populate_blazegraph.parse_data_in_batches(filepath_input, filepath_output,
                                  nrdocs=nrdocs, batchsize=batchsize)
