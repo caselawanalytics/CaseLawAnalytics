@@ -2,4 +2,4 @@
 blazegraph.jnl
 javascript/.idea/*
 blazegraph_querier/__pycache__
-parser/__pycache__
+rechtspraak_parser/__pycache__
