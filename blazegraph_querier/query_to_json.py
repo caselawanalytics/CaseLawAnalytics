@@ -2,7 +2,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-import parser.matcher as matcher
+import rechtspraak_parser.matcher as matcher
 from . import network_analysis
 import json
 import itertools
@@ -29,6 +29,7 @@ def retrieve_from_sparql(searchstring, sparql):
       {
         BIND("link" AS ?type).
         ?id dcterm:references ?to.
+        ?to dcterm:type	<http://psi.rechtspraak.nl/uitspraak>.
         include %matcheddocs
       }
        union
@@ -83,6 +84,7 @@ def retrieve_predicate_object(pred, obj, sparql):
       {
         BIND("link" AS ?type).
         ?id dcterm:references ?to.
+        ?to dcterm:type	<http://psi.rechtspraak.nl/uitspraak>.
         include %matcheddocs
       }
        union
