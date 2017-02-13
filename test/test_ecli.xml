@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<open-rechtspraak>
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:ecli="https://e-justice.europa.eu/ecli" xmlns:tr="http://tuchtrecht.overheid.nl/" xmlns:eu="http://publications.europa.eu/celex/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:bwb="bwb-dl" xmlns:cvdr="http://decentrale.regelgeving.overheid.nl/cvdr/" xmlns:psi="http://psi.rechtspraak.nl/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <rdf:Description>
+      <dcterms:identifier>ECLI:NL:HR:1999:AA3837</dcterms:identifier>
+      <dcterms:format>text/xml</dcterms:format>
+      <dcterms:accessRights>public</dcterms:accessRights>
+      <dcterms:modified>2016-04-08T03:42:13</dcterms:modified>
+      <dcterms:issued rdfs:label="Publicatiedatum">2013-04-04</dcterms:issued>
+      <dcterms:publisher resourceIdentifier="http://rechtspraak.nl/">Raad voor de Rechtspraak</dcterms:publisher>
+      <dcterms:language>nl</dcterms:language>
+      <dcterms:replaces rdfs:label="Vervangt">AA3837</dcterms:replaces>
+      <dcterms:creator rdfs:label="Instantie" resourceIdentifier="http://standaarden.overheid.nl/owms/terms/Hoge_Raad_der_Nederlanden" scheme="overheid.RechterlijkeMacht">Hoge Raad</dcterms:creator>
+      <dcterms:date rdfs:label="Uitspraakdatum">1999-12-10</dcterms:date>
+      <psi:zaaknummer rdfs:label="Zaaknr">C98/202HR</psi:zaaknummer>
+      <dcterms:type rdf:language="nl" resourceIdentifier="http://psi.rechtspraak.nl/uitspraak">Uitspraak</dcterms:type>
+      <psi:procedure rdf:language="nl" rdfs:label="Procedure" resourceIdentifier="http://psi.rechtspraak.nl/procedure#cassatie">Cassatie</psi:procedure>
+      <dcterms:coverage>NL</dcterms:coverage>
+      <dcterms:subject rdfs:label="Rechtsgebied" resourceIdentifier="http://psi.rechtspraak.nl/rechtsgebied#civielRecht">Civiel recht</dcterms:subject>
+      <dcterms:references rdfs:label="Wetsverwijzing" bwb:resourceIdentifier="1.0:v:BWB:BWBR0002565&amp;artikel=68a&amp;g=1999-12-10">Overgangswet nieuw Burgerlijk Wetboek 68a</dcterms:references>
+      <dcterms:references rdfs:label="Wetsverwijzing" bwb:resourceIdentifier="1.0:v:BWB:BWBR0002565&amp;artikel=69&amp;g=1999-12-10">Overgangswet nieuw Burgerlijk Wetboek 69</dcterms:references>
+      <dcterms:references rdfs:label="Wetsverwijzing" bwb:resourceIdentifier="1.0:v:BWB:BWBR0002565&amp;artikel=74&amp;g=1999-12-10">Overgangswet nieuw Burgerlijk Wetboek 74</dcterms:references>
+      <dcterms:hasVersion rdfs:label="Vindplaatsen" resourceIdentifier="http://psi.rechtspraak.nl/vindplaats">
+        <rdf:list>
+          <rdf:li>Rechtspraak.nl</rdf:li>
+          <rdf:li>JOR 2000/91 met annotatie van C.J.M. Klaassen hoogleraar burgerlijk recht en burgerlijk procesrecht KU Nijmegen</rdf:li>
+          <rdf:li>RvdW 1999, 199</rdf:li>
+          <rdf:li>VR 2000, 118</rdf:li>
+          <rdf:li>NJ 2000, 211 met annotatie van P.A. Stein</rdf:li>
+        </rdf:list>
+      </dcterms:hasVersion>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://deeplink.rechtspraak.nl/uitspraak?id=ECLI:NL:HR:1999:AA3837">
+      <dcterms:identifier>http://deeplink.rechtspraak.nl/uitspraak?id=ECLI:NL:HR:1999:AA3837</dcterms:identifier>
+      <dcterms:format>text/html</dcterms:format>
+      <dcterms:accessRights>public</dcterms:accessRights>
+      <dcterms:modified>2013-04-04T15:54:03</dcterms:modified>
+      <dcterms:issued rdfs:label="Publicatiedatum">2001-07-04</dcterms:issued>
+      <dcterms:publisher resourceIdentifier="http://rechtspraak.nl/">Raad voor de Rechtspraak</dcterms:publisher>
+      <dcterms:language>nl</dcterms:language>
+      <dcterms:title rdf:language="nl">ECLI:NL:HR:1999:AA3837 Hoge Raad , 10-12-1999 / C98/202HR</dcterms:title>
+      <dcterms:abstract resourceIdentifier="../../rs:inhoudsindicatie" />
+    </rdf:Description>
+  </rdf:RDF>
+  <inhoudsindicatie id="ECLI:NL:HR:1999:AA3837:INH" lang="nl" xml:space="preserve" xmlns="http://www.rechtspraak.nl/schema/rechtspraak-1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <para>-</para>
+    </inhoudsindicatie>
+  <uitspraak id="ECLI:NL:HR:1999:AA3837:DOC" lang="nl" xml:space="preserve" xmlns="http://www.rechtspraak.nl/schema/rechtspraak-1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <parablock>
+        <para>10 december 1999</para>
+        <para>Eerste Kamer</para>
+        <para>Nr. C98/202HR</para>
+        <para>AT</para>
+      </parablock>
+      <para />
+      <para />
+      <parablock>
+        <para>Hoge Raad der Nederlanden</para>
+        <para>Arrest</para>
+      </parablock>
+      <para />
+      <para>in de zaak van:</para>
+      <para />
+      <parablock>
+        <para>[Eiseres],</para>
+        <para>wonende te [woonplaats],</para>
+        <para>EISERES tot cassatie,</para>
+        <para>advocaat: mr E. Grabandt,</para>
+      </parablock>
+      <para />
+      <para>t e g e n</para>
+      <para />
+      <parablock>
+        <para>STICHTING PASTEURZIEKENHUIS,</para>
+        <para>gevestigd te Oosterhout,</para>
+        <para>VERWEERSTER in cassatie,</para>
+        <para>niet verschenen.</para>
+      </parablock>
+      <para />
+      <parablock>
+        <para>1.	Het geding in feitelijke instanties</para>
+        <para>	Eiseres tot cassatie [..] heeft bij exploit van 27 juli 1996 verweerster in cassatie - verder te noemen: het ziekenhuis - gedagvaard voor de Kantonrechter te Breda en gevorderd het ziekenhuis te veroordelen om:</para>
+        <para>1.	[Eiseres] ter zake van het ongeval op 14 augustus 1995 volledig schadeloos te stellen, waarbij de schade te gelegener tijd dient te worden opgemaakt bij staat;</para>
+        <para>2.	aan [eiseres] te voldoen een bedrag van ƒ 2.200,-- inclusief BTW aan buitengerechtelijke kosten.</para>
+      </parablock>
+      <para />
+      <parablock>
+        <para>	Het ziekenhuis heeft de vorderingen bestreden.</para>
+        <para>	De Kantonrechter heeft bij vonnis van 9 april 1997 de vorderingen afgewezen.</para>
+        <para>	Tegen dit vonnis heeft [eiseres] hoger beroep ingesteld bij de Rechtbank te Breda.</para>
+        <para>	Bij vonnis van 17 maart 1998 heeft de Rechtbank het bestreden vonnis van de Kantonrechter bekrachtigd.</para>
+        <para>	Het vonnis van de Rechtbank is aan dit arrest gehecht.</para>
+      </parablock>
+      <para />
+      <parablock>
+        <para>2.	Het geding in cassatie</para>
+        <para>	Tegen het vonnis van de Rechtbank heeft [eiseres] beroep in cassatie ingesteld. De cassatiedagvaarding is aan dit arrest gehecht en maakt daarvan deel uit.</para>
+        <para>	Tegen het niet verschenen ziekenhuis is verstek verleend.</para>
+        <para>	Het ziekenhuis heeft de zaak doen toelichten door haar advocaat.</para>
+        <para>	De conclusie van de plaatsvervangend Procureur-Generaal strekt tot vernietiging van het bestreden vonnis, tot verwijzing van de zaak naar het Gerechtshof te      's-Hertogenbosch, en tot veroordeling van het ziekenhuis in de kosten.</para>
+      </parablock>
+      <para />
+      <parablock>
+        <para>3.	Beoordeling van het middel</para>
+        <para>3.1  	In cassatie moet van het volgende worden uitgegaan.</para>
+        <para>(i)  	[Eiseres] is sedert 1 juni 1985 op grond van een arbeidsovereenkomst in dienst van het ziekenhuis.</para>
+        <para>(ii)  Op 14 augustus 1995 had zij dienst op de afdeling spoedeisende hulp van het ziekenhuis.</para>
+        <para>(iii) [Eiseres] bekleedde op dat moment de functie van A-verpleegkundige en had de aanvullende opleiding verpleegkundige specialisatie spoedeisende hulp met succes afgerond.</para>
+        <para>(iv)  Op de afdeling spoedeisende hulp wordt gebruik gemaakt van steriele optreknaalden. Die naalden zijn ieder afzonderlijk verpakt, waarbij een aantal van die afzonderlijke verpakkingen telkens afritsbaar aan elkaar is geschakeld. Zij plachten destijds klaar te worden gezet in een potje op het bovenblad van een zogenaamde verbandkar.</para>
+        <para>(v)  	[eiseres] heeft op de genoemde datum in de uitoefening van haar functie en tijdens werktijd van elders verbandmiddelen opgehaald. Toen zij deze op de verbandkar wilde leggen, is zij plotseling uitgegleden en ten val gekomen. Als gevolg van die val heeft zij haar heup gebroken.</para>
+        <para>(vi)  Direct na dit ongeval is in de onmiddellijke omgeving van [eiseres] een verpakte optreknaald gevonden.</para>
+      </parablock>
+      <para />
+      <parablock>
+        <para>3.2  Stellende dat zij tijdens de uitvoering van haar werkzaamheden in het ziekenhuis is uitgegleden over een op de vloer liggende verpakte optreknaald als gevolg waarvan zij een fractuur aan haar linkerheup heeft opgelopen, heeft [eiseres] vergoeding van schade, op te maken bij staat, alsmede vergoeding van buitengerechtelijke kosten gevorderd. Aan die vorderingen heeft zij ten grondslag gelegd dat het ziekenhuis is tekortgeschoten in de nakoming van zijn uit art. 7A:1638x (oud) BW voortvloeiende verplichtingen. Door de verbandkar waarmee werd gewerkt niet zodanig in te richten dat werd voorkomen dat naalden als hier bedoeld op de grond konden vallen, heeft het ziekenhuis, aldus [eiseres], haar onvoldoende beschermd tegen  het risico van een val als door haar gemaakt. Het ziekenhuis heeft gemotiveerd betwist dat het niet aan zijn uit art. 1638x voortvloeiende verplichtingen heeft voldaan.</para>
+        <para>	De Kantonrechter heeft geoordeeld dat het ziekenhuis niet is tekortgeschoten in die verplichtingen en heeft de vorderingen van [eiseres] afgewezen.</para>
+      </parablock>
+      <para />
+      <parablock>
+        <para>3.3  De Rechtbank heeft geoordeeld dat het geschil in volle omvang aan haar was voorgelegd. Na de standpunten van [eiseres] en het ziekenhuis te hebben weergegeven, heeft zij in rov. 3.6 geoordeeld:</para>
+        <para>“Uit het feit dat zij een steriele naald op de grond zag liggen nadat zij was gevallen leidt [eiseres] af dat zij hierover is uitgegleden. Uitgaande van de juistheid van deze stelling is de vraag aan de orde of de betreffende naald op de grond is terecht gekomen als gevolg van schending door [het ziekenhuis] van haar zorgplicht. Uit de door partijen overgelegde stukken blijkt dat niet kon worden vastgesteld hoe de naald in de gang op de grond terecht was gekomen. [Eiseres] heeft bovendien geen bewijsaanbod gedaan dat hierop betrekking heeft. Het feit dat het causaal verband tussen de val van [eiseres] en het al dan niet voldoen aan haar zorgplicht door [het ziekenhuis] niet is komen vast te staan brengt mee dat de rechtbank niet toekomt aan de beoordeling van een eventuele schending van deze zorgplicht.”</para>
+      </parablock>
+      <para />
+      <para>	Het middel keert zich tegen deze rechtsoverweging.</para>
+      <para />
+      <parablock>
+        <para>3.4  	Bij de beoordeling van het middel moet het volgende worden vooropgesteld. Op 1 april 1997 is titel 7.10 BW (arbeidsovereenkomst) in werking getreden. Bijzondere overgangsbepalingen zijn niet vastgesteld. Ook titel 8 Ow NBW (overgangsbepalingen in verband met boek 7) bevat niet zodanige bijzondere overgangsbepalingen. De vraag of in het onderhavige geval art. 7A:1638x (oud) BW of art.     7:658 BW van toepassing is, moet derhalve beantwoord worden aan de hand van titel 3 (Algemene overgangsbepalingen in verband met de boeken 3 - 8) Ow NBW. Art. 7:658 lid 1 bevat ten opzichte van art. 1638x niet zodanige wijzigingen dat niet de hoofdregel van art. 68a lid 1, te weten: onmiddellijke werking, maar art. 69 lid 1, aanhef en onder d, Ow NBW zou moeten worden toegepast. De wijziging die art. 7:658 lid 2 inhoudt ten opzichte van 1638x lid 2, komt neer op een omkering van de bewijslast. Daarmee is de wetgever tegemoetgekomen aan de kritiek op de bewijslastverdeling krachtens art. 1638x, die algemeen als verouderd werd  beschouwd. Ook de Hoge Raad was reeds in een reeks van arresten in belangrijke mate tegemoetgekomen aan die kritiek; zie onder meer HR 25 juni 1982, nr. 11857, NJ !983, 151, HR 6 april 1990, nr. 13783, NJ 1990, 573, HR 20    september 1996, nr. 16027, NJ 1997, 198 en HR 17 oktober 1997, nr. 16412, NJ 1998, 241. Ook voormelde wijziging leidt niet tot toepasselijkheid van art. 69 lid 1, aanhef en onder d, in plaats van de hoofdregel van art. 68a lid 1. </para>
+        <para> 	Dit een en ander leidt tot de slotsom dat de vraag of het ziekenhuis aansprakelijk is voor de door [eiseres] geleden schade in ieder geval in hoger beroep en in cassatie moet worden beoordeeld aan de hand van het bepaalde in art. 7:658.</para>
+      </parablock>
+      <para />
+      <parablock>
+        <para>3.5  Het middel klaagt in zijn onderscheiden onderdelen terecht dat de Rechtbank in rov. 3.6 blijk heeft gegeven van een onjuiste rechtsopvatting omtrent de verdeling van stelplicht en bewijslast. Nu [eiseres] de schade heeft geleden in de uitoefening van haar werkzaamheden, brengt het bepaalde in art. 7:658 lid 2 mee dat, anders dan de Rechtbank heeft geoordeeld, het ziekenhuis aansprakelijk is voor de door [eiseres] ten gevolge van haar val geleden schade, tenzij het aantoont dat het de in lid 1 van dat artikel genoemde verplichtingen is nagekomen of dat de schade in belangrijke mate het gevolg is van opzet of bewuste roekeloosheid van [eiseres]. Hiervoor behoeft niet vast te staan aan welke oorzaak het ongeval van [eiseres] te wijten is.</para>
+        <para>	Die oorzaak is wel in zoverre van belang, dat het ziekenhuis zal kunnen volstaan met aan te tonen hetzij dat het heeft voldaan aan alle verplichtingen die ingevolge lid 1 op hem rustten teneinde een ongeval zoals dat aan [eiseres] is overkomen, te voorkomen, hetzij dat nakoming van die verplichtingen het ongeval niet zou hebben voorkomen.</para>
+      </parablock>
+      <para />
+      <parablock>
+        <para>4. 	Beslissing</para>
+        <para>	De Hoge Raad:</para>
+        <para>	vernietigt het vonnis van de Rechtbank te Breda van 17 maart 1998;</para>
+        <para>	verwijst het geding ter verdere behandeling en beslissing naar het Gerechtshof te ’s-Hertogenbosch;</para>
+        <para>	veroordeelt het ziekenhuis in de kosten van het geding in cassatie, tot op deze uitspraak aan de zijde van [eiseres] begroot op ƒ 684,54 aan verschotten en ƒ 3.500,-- voor salaris.</para>
+      </parablock>
+      <para />
+      <para>	Dit arrest is gewezen door de vice-president    Mijnssen als voorzitter en de raadsheren Herrmann, Van der Putt-Lauwers, Fleers en De Savornin Lohman, en in het openbaar uitgesproken door de raadsheer Heemskerk op     10 december 1999.</para>
+    </uitspraak>
+</open-rechtspraak>
