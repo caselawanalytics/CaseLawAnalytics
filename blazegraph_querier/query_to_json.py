@@ -125,12 +125,12 @@ def parse_nodes(nodes_in, variables):
     nodes_json = []
     unique_ids = []
     for d in nodes_in:
-        if d['id']['value'] not in unique_ids:
+        if d['id'] not in unique_ids:
             dout = {}
             for var in variables:
-                dout[var] = d.get(var,{'value':''})['value']
+                dout[var] = d.get(var, '')
             nodes_json.append(dout)
-            unique_ids.append(d['id']['value'] )
+            unique_ids.append(d['id'])
     return nodes_json, unique_ids
 
 
@@ -158,15 +158,15 @@ def enrich_nodes(nodes, vindplaatsen, articles):
         node['year'] = ecli_to_year(node['ecli'])
 
     # get the keys (case id) and value (article name)
-    articles_kv = [(item['id']['value'], item['article']['value']) for item in articles]
+    articles_kv = [(item['id'], item['article']) for item in articles]
     articles_grouped = itertools.groupby(articles_kv, lambda x: x[0])
     articles_dict = {k: list(set([val[1] for val in g])) for k,g in articles_grouped}
 
     count_version = {}
     count_annotation = {}
     for item in vindplaatsen:
-        id0 = item['id']['value']
-        val = item['hasVersion']['value']
+        id0 = item['id']
+        val = item['hasVersion']
         count_version[id0] = count_version.get(id0, 0) + 1
         if val.lower().find('met annotatie') >= 0:
             count_annotation[id0] = count_annotation.get(id0, 0) + 1
@@ -183,9 +183,9 @@ def parse_links(links_in, node_ids):
     unique_link_ids = []
     links_json = []
     for d in links_in:
-        target = d['to']['value']
+        target = d['to']
         if target in node_ids:
-            dout = {'source': d['id']['value'],
+            dout = {'source': d['id'],
                     'target': target }
             dout['id'] = dout['source'] + '_' + dout['target']
             if dout['id'] not in unique_link_ids:
@@ -193,7 +193,8 @@ def parse_links(links_in, node_ids):
                 unique_link_ids.append(dout['id'])
     return links_json
 
-
+def transform_result_item(item):
+    return {k: item[k]['value'] for k in item}
 
 def query(searchstring, only_linked=True, sparql=None, pred=None, obj=None):
     if sparql is None:
@@ -208,19 +209,17 @@ def query(searchstring, only_linked=True, sparql=None, pred=None, obj=None):
     # Parse the nodes
     variables = [x for x in nodes_and_links['head']['vars'] if
                  x not in ['type', 'from', 'to', 'hasVersion', 'article']]
-    nodes = [res for res in nodes_and_links['results']['bindings'] if
-             res['type']['value'] == 'node']
-    vindplaatsen = [res for res in nodes_and_links['results']['bindings'] if
-                    res['type']['value'] == 'vindplaats']
-    articles = [res for res in nodes_and_links['results']['bindings'] if
-                    res['type']['value'] == 'article']
+
+    data = [transform_result_item(item) for item in nodes_and_links['results']['bindings']]
+    nodes = [res for res in data  if res['type'] == 'node']
+    vindplaatsen = [res for res in data  if res['type'] == 'vindplaats']
+    articles = [res for res in data  if res['type'] == 'article']
     nodes_json, node_ids = parse_nodes(nodes, variables)
 
     nodes_json = enrich_nodes(nodes_json, vindplaatsen, articles)
 
     # Parse the links
-    links = [res for res in nodes_and_links['results']['bindings'] if
-             res['type']['value'] == 'link']
+    links = [res for res in data  if res['type'] == 'link']
     links_json = parse_links(links, node_ids)
 
     # Add network analysis
