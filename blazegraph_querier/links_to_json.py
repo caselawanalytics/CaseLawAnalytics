@@ -8,8 +8,8 @@ from rdflib.namespace import DCTERMS
 import rdflib
 from blazegraph_querier import query_to_json, network_analysis
 
-def read_csv(path, sep=','):
-    links_df = pd.read_csv(path, sep=sep)
+def read_csv(path, sep=',', header='infer'):
+    links_df = pd.read_csv(path, sep=sep, header=0)
     links_df.columns = ['id', 'reference']
     links_df = links_df.drop_duplicates()
     eclis = list(pd.concat([links_df['id'], links_df['reference']]).unique())

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 <head>
     <meta charset="UTF-8">
     <title>Case Law Querier</title>
@@ -8,18 +9,40 @@
     <h1>Case Law Querier</h1>
     <div class="formpage">
           {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
-        <form action="{{ url_for('query') }}" method="post">
+        <div class="form">
+            <h2>Search by keyword</h2>
+            <form action="{{ url_for('query') }}" method="post">
             <dl>
               <dt>Keyword:
               <dd><input type="text" name="keyword">
-              <dt>Only cases with links::
+              <dt>Only cases with links:
               <dd><input type="checkbox" name="only_linked">
               <dd><input type="submit" value="Search">
             </dl>
           </form>
+        </div>
+        <div class="form">
+            <h2>Search by list of links</h2>
+            <form action="{{ url_for('query_links') }}" method="post">
+            <dl>
+              <dt>Title:
+              <dd><input type="text" name="title">
+              <dt>Provide ECLI identifiers for links. Each line should contain the ECLI identifiers for the from and to nodes, separated by commas.
+              <dd>  <textarea  rows="10" cols="50" class="links_csv" name="links"></textarea>
+              <dd><input type="submit" value="Search">
+            </dl>
+          </form>
+        </div>
 
-        {% if network_json %}<textarea  rows="10" cols="50" class="network_output"> {{ network_json }}</textarea>{% endif %}
-        {% if network_csv %}<textarea  rows="10" cols="50" class="network_output"> {{ network_csv }}</textarea>{% endif %}
+        <div class="form">
+            <h2>Result</h2>
+            {% if network_json %}
+                <textarea  rows="10" cols="50" class="network_output"> {{ network_json }}</textarea>
+                <a href="/download-json/" target="blank"><button class='btn btn-default'>Download json</button></a>
+            {% endif %}
+            {% if network_csv %}<textarea  rows="10" cols="50" class="network_output"> {{ network_csv }}</textarea>{% endif %}
+        </div>
+
     </div>
 </body>
 </html>
