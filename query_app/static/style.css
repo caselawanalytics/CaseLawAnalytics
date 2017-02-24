@@ -1,11 +1,29 @@
 body {
+    background: #fff;
     font-family: sans-serif;
-    background: #eee;
 }
+
+.title {
+  background-color: #222;
+  height: 50px;
+  padding: 20px;
+	position:relative;
+	z-index:2;
+	width:100%;
+  color: white;
+}
+
 .form {
     border: 5px solid #ccc;
 }
+
 .result {
     margin: 5px;
     border: 5px solid #ccc;
+}
+
+p.error {
+    background: #F0D6D6;
+    z-index: 2;
+    margin: 5px;
 }
