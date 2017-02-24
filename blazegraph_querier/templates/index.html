@@ -29,7 +29,7 @@
               <dd><input type="text" name="title">
               <dt>Provide ECLI identifiers for links. Each line should contain the ECLI identifiers for the from and to nodes, separated by commas.
               <dd>  <textarea  rows="10" cols="50" class="links_csv" name="links"></textarea>
-              <dd><input type="submit" value="Search">
+                <dd><input type="submit" value="Search">
             </dl>
           </form>
         </div>
@@ -37,10 +37,18 @@
         <div class="form">
             <h2>Result</h2>
             {% if network_json %}
-                <textarea  rows="10" cols="50" class="network_output"> {{ network_json }}</textarea>
-                <a href="/download-json/" target="blank"><button class='btn btn-default'>Download json</button></a>
+                <form action="{{url_for('download_json')}}" method="post">
+                    <textarea  rows="10" cols="50" class="network_output" name="network_json"> {{ network_json }}</textarea>
+                    <input type="submit" value="Download JSON">
+                </form>
             {% endif %}
-            {% if network_csv %}<textarea  rows="10" cols="50" class="network_output"> {{ network_csv }}</textarea>{% endif %}
+            {% if network_csv %}
+                <form action="{{url_for('download_csv')}}" method="post">
+                    <textarea  rows="10" cols="50" class="network_output" name="network_csv"> {{ network_csv }}</textarea>
+                    <input type="submit" value="Download CSV">
+                </form>
+            {% endif %}
+
         </div>
 
     </div>

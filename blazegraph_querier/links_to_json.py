@@ -18,16 +18,21 @@ def read_csv(path, sep=',', header='infer'):
 
 def make_graph(links, eclis):
     graph = Graph()
+    existing_eclis = []
     for ecli in eclis:
         try:
             element = populate_blazegraph.retrieve_from_web(ecli)
+            graph += parser.parse_xml_element(element, ecli)
+            existing_eclis += ecli
         except:
             print("Could not parse: " + ecli)
-        graph += parser.parse_xml_element(element, ecli)
 
     # Add links to the graph
     for i, r in links.iterrows():
-        create_link(r['id'], r['reference'], graph)
+        source = r['id']
+        target = r['reference']
+        # if source in existing_eclis and target in existing_eclis:
+        create_link(source, target, graph)
     return graph
 
 def ecli_to_url(ecli):
