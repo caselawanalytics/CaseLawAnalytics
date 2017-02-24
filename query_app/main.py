@@ -10,29 +10,6 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/query_keyword', methods=['POST'])
-def query():
-    try:
-        network_json = None
-        network_csv = None
-        if('keyword' in request.form):
-            searchstring = request.form['keyword']
-            only_linked = request.form.get('only_linked', False)
-            nodes, links = query_to_json.query(searchstring,
-                                                         only_linked=only_linked)
-            network_json = query_to_json.to_sigma_json(nodes, links, searchstring)
-            network_csv = query_to_json.to_csv(nodes)
-
-        return render_template("index.html",
-                               network_json=network_json,
-                               network_csv=network_csv)
-    except Exception as error:
-        print(error)
-        traceback.print_exc()
-        return render_template("index.html",
-                        error="Sorry, something went wrong!")
-
-
 @app.route('/query_links', methods=['POST'])
 def query_links():
     try:

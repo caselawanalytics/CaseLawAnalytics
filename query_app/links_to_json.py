@@ -6,7 +6,7 @@ from rechtspraak_parser import parser, populate_blazegraph
 from rdflib import Graph
 from rdflib.namespace import DCTERMS
 import rdflib
-from blazegraph_querier import query_to_json, network_analysis
+from query_app import query_to_json, network_analysis
 
 def read_csv(path, sep=',', header='infer'):
     links_df = pd.read_csv(path, sep=sep, header=0)

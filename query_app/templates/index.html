@@ -10,18 +10,6 @@
     <div class="formpage">
           {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
         <div class="form">
-            <h2>Search by keyword</h2>
-            <form action="{{ url_for('query') }}" method="post">
-            <dl>
-              <dt>Keyword:
-              <dd><input type="text" name="keyword">
-              <dt>Only cases with links:
-              <dd><input type="checkbox" name="only_linked">
-              <dd><input type="submit" value="Search">
-            </dl>
-          </form>
-        </div>
-        <div class="form">
             <h2>Search by list of links</h2>
             <form action="{{ url_for('query_links') }}" method="post">
             <dl>
