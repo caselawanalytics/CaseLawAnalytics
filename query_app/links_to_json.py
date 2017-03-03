@@ -68,6 +68,16 @@ def get_query():
        optional { ?id dcterm:title ?title}
       }
       union
+        {
+        BIND("node" AS ?type).
+       ?id dcterm:type	<http://psi.rechtspraak.nl/conclusie>.
+           optional { ?id dcterm:creator ?creator}.
+       optional { ?id dcterm:abstract ?abstract}.
+       optional { ?id dcterm:subject ?subject}.
+       optional { ?id dcterm:date ?date}.
+       optional { ?id dcterm:title ?title}
+      }
+      union
       {
         BIND("vindplaats" AS ?type).
         ?id dcterm:hasVersion ?hasVersion
