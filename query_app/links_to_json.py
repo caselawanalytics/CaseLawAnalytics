@@ -6,11 +6,14 @@ from rechtspraak_parser import parser, populate_blazegraph
 from rdflib import Graph
 from rdflib.namespace import DCTERMS
 import rdflib
-from blazegraph_querier import query_to_json, network_analysis
+from query_app import query_to_json, network_analysis
 
 def read_csv(path, sep=',', header='infer'):
-    links_df = pd.read_csv(path, sep=sep, header=0)
+    links_df = pd.read_csv(path, sep=sep, header=header)
     links_df.columns = ['id', 'reference']
+    # Strip leading or trailing whitespace
+    links_df.id = links_df.id.str.strip()
+    links_df.reference = links_df.reference.str.strip()
     links_df = links_df.drop_duplicates()
     eclis = list(pd.concat([links_df['id'], links_df['reference']]).unique())
     return links_df, eclis
@@ -23,7 +26,7 @@ def make_graph(links, eclis):
         try:
             element = populate_blazegraph.retrieve_from_web(ecli)
             graph += parser.parse_xml_element(element, ecli)
-            existing_eclis += ecli
+            existing_eclis += [ecli]
         except:
             print("Could not parse: " + ecli)
 
@@ -33,7 +36,7 @@ def make_graph(links, eclis):
         target = r['reference']
         # if source in existing_eclis and target in existing_eclis:
         create_link(source, target, graph)
-    return graph
+    return graph, existing_eclis
 
 def ecli_to_url(ecli):
     return "http://deeplink.rechtspraak.nl/uitspraak?id={}".format(ecli)
@@ -58,6 +61,16 @@ def get_query():
         {
         BIND("node" AS ?type).
        ?id dcterm:type	<http://psi.rechtspraak.nl/uitspraak>.
+           optional { ?id dcterm:creator ?creator}.
+       optional { ?id dcterm:abstract ?abstract}.
+       optional { ?id dcterm:subject ?subject}.
+       optional { ?id dcterm:date ?date}.
+       optional { ?id dcterm:title ?title}
+      }
+      union
+        {
+        BIND("node" AS ?type).
+       ?id dcterm:type	<http://psi.rechtspraak.nl/conclusie>.
            optional { ?id dcterm:creator ?creator}.
        optional { ?id dcterm:abstract ?abstract}.
        optional { ?id dcterm:subject ?subject}.
