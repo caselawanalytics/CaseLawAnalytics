@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/NLeSC/CaseLawAnalytics.svg?branch=master)](https://travis-ci.org/NLeSC/CaseLawAnalytics)
+
 # CaseLawAnalytics
 This repository contains code for the case law query app: an application to query Dutch law cases and extract a network to use in the [case law visualization app](https://github.com/NLeSC/case-law-app).
 
