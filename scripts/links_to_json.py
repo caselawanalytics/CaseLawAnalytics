@@ -9,7 +9,7 @@ python scripts/links_to_json.py input_file.csv output_file.json "title"
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-from query_app import links_to_json, query_to_json
+from rechtspraak_query_app import links_to_json, query_to_json
 
 
 

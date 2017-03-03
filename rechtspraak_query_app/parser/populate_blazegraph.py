@@ -4,13 +4,15 @@ parses them and upload them to the blazegraph SPARQL point.
 
 TODO: handle exceptions better
 """
-from lxml import etree
 import os
 import re
-from . import parser
-from SPARQLWrapper import SPARQLWrapper, JSON
 
-namespace = "hogeraad"
+from SPARQLWrapper import SPARQLWrapper
+from lxml import etree
+
+from . import parser
+
+namespace = "kb"#"hogeraad"
 sparql_endpoint = "http://localhost:9999/blazegraph/namespace/{}/sparql".format(namespace)
 
 
@@ -44,7 +46,7 @@ def get_first_content(el, tag):
 # Functions for retrieving complete xml documents
 ##################################
 def retrieve_from_web(ecli):
-    link = 'http://data.rechtspraak.nl/uitspraken/content?id=' + ecli
+    link = 'http://data.rechtspraak.nl/uitspraken/content?id={}'.format(ecli)
     return etree.ElementTree().parse(link)
 
 

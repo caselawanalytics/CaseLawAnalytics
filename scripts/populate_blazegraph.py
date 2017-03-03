@@ -8,10 +8,11 @@ n : maximum number of documents to obtain
 b : batch size
 '''
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-from rechtspraak_parser import populate_blazegraph
+from rechtspraak_query_app.parser import populate_blazegraph
 
 if __name__ == "__main__":
     import sys
@@ -27,4 +28,4 @@ if __name__ == "__main__":
     print("Writing n3 files to: ", filepath_output)
     print(nrdocs, "documents, batch size of ", batchsize)
     populate_blazegraph.parse_data_in_batches(filepath_input, filepath_output,
-                                 nrdocs=nrdocs, batchsize=batchsize)
+                                              nrdocs=nrdocs, batchsize=batchsize)

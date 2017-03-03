@@ -1,6 +1,7 @@
 *.db
 blazegraph.jnl
 javascript/.idea/*
-query_app/__pycache__
-rechtspraak_parser/__pycache__
+rechtspraak_query_app/__pycache__
 test/__pycache__
+.cache
+*.pyc

@@ -1,12 +1,14 @@
-import pandas as pd
-import sys
 import os
+import sys
+
+import pandas as pd
+
 sys.path.insert(0, os.path.abspath('..'))
-from rechtspraak_parser import parser, populate_blazegraph
+from rechtspraak_query_app.parser import parser, populate_blazegraph
 from rdflib import Graph
 from rdflib.namespace import DCTERMS
 import rdflib
-from query_app import query_to_json, network_analysis
+from rechtspraak_query_app import query_to_json, network_analysis
 
 def read_csv(path, sep=',', header='infer'):
     links_df = pd.read_csv(path, sep=sep, header=header)

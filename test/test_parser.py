@@ -1,9 +1,7 @@
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-from rechtspraak_parser import parser
+from rechtspraak_query_app.parser import parser
 from lxml import etree
-from rdflib.namespace import DCTERMS, RDFS
+from rdflib.namespace import DCTERMS
+
 
 def test_parse_element():
     element = etree.ElementTree().parse("test/test_ecli.xml")

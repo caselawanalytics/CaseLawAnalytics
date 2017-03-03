@@ -1,8 +1,10 @@
-from SPARQLWrapper import SPARQLWrapper, JSON
 import os
 import sys
+
+from SPARQLWrapper import SPARQLWrapper, JSON
+
 sys.path.insert(0, os.path.abspath('..'))
-import rechtspraak_parser.matcher as matcher
+import rechtspraak_query_app.parser.matcher as matcher
 from . import network_analysis
 import json
 import itertools
