@@ -5,3 +5,4 @@ rechtspraak_query_app/__pycache__
 test/__pycache__
 .cache
 *.pyc
+.coverage
