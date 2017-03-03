@@ -17,19 +17,25 @@ def get_network(nodes, links):
 
 def add_network_statistics(nodes, links):
     graph = get_network(nodes, links)
-    hubs, authorities = nx.hits(graph)
-    statistics = {
-        'degree': nx.degree(graph),
-        'in_degree': graph.in_degree(),
-        'out_degree': graph.out_degree(),
+    degree = nx.degree(graph)
+    if max(degree.values()) > 0:
+        hubs, authorities = nx.hits(graph)
+        statistics = {
+            'degree': degree,
+            'in_degree': graph.in_degree(),
+            'out_degree': graph.out_degree(),
 
-        'degree_centrality': nx.degree_centrality(graph),
-        'in_degree_centrality': nx.in_degree_centrality(graph),
-        'out_degree_centrality': nx.out_degree_centrality(graph),
-        'betweenness_centrality': nx.betweenness_centrality(graph),
-        'hubs': hubs,
-        'authorities': authorities
-    }
+            'degree_centrality': nx.degree_centrality(graph),
+            'in_degree_centrality': nx.in_degree_centrality(graph),
+            'out_degree_centrality': nx.out_degree_centrality(graph),
+            'betweenness_centrality': nx.betweenness_centrality(graph),
+            'hubs': hubs,
+            'authorities': authorities
+        }
+    else:
+        statistics = {}
+
+
     for node in nodes:
         nodeid = node['id']
         for var in statistics.keys():

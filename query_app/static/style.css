@@ -27,3 +27,9 @@ p.error {
     z-index: 2;
     margin: 5px;
 }
+
+p.warning {
+    background: #F0D6A6;
+    z-index: 2;
+    margin: 5px;
+}
