@@ -8,6 +8,7 @@ import rechtspraak_query_app.parser.matcher as matcher
 from . import network_analysis
 import json
 import itertools
+import random
 
 DEFAULT_SPARQL_ENDPOINT = "http://localhost:9999/blazegraph/namespace/hogeraad/sparql"
 
@@ -244,6 +245,11 @@ def to_d3_json(nodes, links, filename):
 
 
 def to_sigma_json(nodes, links, title, filename=None):
+    # Add random start position
+    nodes = [node.copy() for node in nodes]
+    for node in nodes:
+        node['x'] = random.random()
+        node['y'] = random.random()
     if filename is None:
         return json.dumps({'title': title, 'nodes': nodes, 'edges': links})
     with open(filename, 'w') as outfile:
