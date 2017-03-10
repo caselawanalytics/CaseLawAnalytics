@@ -7,3 +7,4 @@ nltk
 flask
 SPARQLWrapper
 pytest
+pycurl
