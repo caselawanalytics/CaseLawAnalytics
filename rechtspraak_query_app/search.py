@@ -2,7 +2,7 @@ import pycurl
 import json
 import pandas as pd
 from io import BytesIO
-from rechtspraak_query_app import links_to_json
+from rechtspraak_query_app import links_to_json, parser, network_analysis, query_to_json
 
 
 def get_post_data(keyword, maximum=1000):
@@ -68,12 +68,48 @@ def get_network_from_keyword(keyword, verbose=True):
             print(pd.DataFrame(facetcounts)[['Identifier', 'Count']])
             print('\n')
 
-    eclis = [res['DeeplinkUrl'].split('=')[-1] for res in result['Results']]
-    # TODO: get links from somewhere
-    links = pd.DataFrame()
-    g, eclis = links_to_json.make_graph(links, eclis)
-    nodes_json, links_json = links_to_json.graph_to_network(g)
+    nodes_json = [result_to_node(res) for res in result['Results']]
+    # TODO: get links from lido
+    links_json = links_from_abstract(nodes_json)
+    # Add network analysis
+    nodes_json = network_analysis.add_network_statistics(nodes_json,
+                                                         links_json)
     return nodes_json, links_json
 
+def links_from_abstract(nodes):
+    links = []
+    eclis = [node['ecli'] for node in nodes]
+    for node in nodes:
+        matched = parser.matcher.get_ecli_references(node['abstract'])
+        for ecli in matched.keys():
+            if ecli in eclis:
+                target = links_to_json.ecli_to_url(ecli)
+                links.append({'source': node['id'],
+                              'target': target,
+                             'id': node['id']+'_'+target})
+    return links
 
-nodes_json, links_json = get_network_from_keyword(keyword = "7:658")
+def result_to_node(result):
+    node = {}
+    node['id'] = result['DeeplinkUrl']
+    node['ecli'] = result['TitelEmphasis']
+    node['creator'] = 'Hoge Raad' # TODO
+    node['title'] = result.get('Titel', node['id'])
+    node['abstract'] = result.get('Tekstfragment', '')
+    node['date'] = result['Publicatiedatum']
+    node['subject'] = result['Rechtsgebieden'][0]
+
+    matched_articles = parser.matcher.get_articles(node['abstract'])
+    node['articles'] = [art + ' ' + book for (art, book), cnt in
+                        matched_articles.items()]
+    node['year'] = int(node['date'].split('-')[-1])
+    node['count_version'] = len(result['Vindplaatsen'])
+    node['count_annotation'] = len([c for c in result['Vindplaatsen'] if
+                            c['VindplaatsAnnotator'] != ''])
+    # New:
+    node['procedure'] = result['Proceduresoorten']
+    return node
+
+keyword = "7:658"
+nodes_json, links_json = get_network_from_keyword(keyword = keyword)
+query_to_json.to_sigma_json(nodes_json, links_json, keyword, filename=None)
