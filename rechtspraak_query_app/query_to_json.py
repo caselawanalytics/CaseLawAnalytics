@@ -263,6 +263,8 @@ def to_csv(nodes, filename=None, variables=None):
         if variables is None:
             variables  = nodes[0].keys()
         df = pd.DataFrame(nodes).set_index('id')
+    if 'abstract' in variables:
+        df['abstract'] = df['abstract'].str.replace('\s', ' ')
     if filename is None:
         return df.to_csv()
     else:
