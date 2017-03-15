@@ -20,7 +20,7 @@ First, clone the repository and run in the root of the repository:
 
 To run the query app:
 
-`export FLASK_APP=blazegraph_querier/main.py`
+`export FLASK_APP=rechtspraak_query_app/main.py`
 
 and run the app:
 
