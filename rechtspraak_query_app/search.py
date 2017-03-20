@@ -110,6 +110,7 @@ def result_to_node(result):
     node['procedure'] = result['Proceduresoorten']
     return node
 
-keyword = "7:658"
-nodes_json, links_json = get_network_from_keyword(keyword = keyword)
-query_to_json.to_sigma_json(nodes_json, links_json, keyword, filename=None)
+if __name__ == "__main__":
+    keyword = "7:658"
+    nodes_json, links_json = get_network_from_keyword(keyword = keyword)
+    query_to_json.to_sigma_json(nodes_json, links_json, keyword, filename=None)
