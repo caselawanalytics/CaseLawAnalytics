@@ -17,6 +17,7 @@ before_install:
 - conda install -q pip
 - "pip install pytest-cov"
 - "pip install ."
+- python -c "import nltk; nltk.download('punkt')"
 
 install:
 - "echo done"
