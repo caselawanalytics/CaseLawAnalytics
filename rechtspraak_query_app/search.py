@@ -12,17 +12,17 @@ def get_post_data(keyword, maximum=1000):
             "PublicatieStatus": "Ongedefinieerd"
         },
         "Contentsoorten": [{
-                "NodeType": 7,
-                "Identifier": "uitspraak",
-                "level": 1
-            }],
+                           "NodeType": 7,
+                           "Identifier": "uitspraak",
+                           "level": 1
+                           }],
         "DatumPublicatie": [],
         "DatumUitspraak": [],
         "Instanties": [{
-                "NodeType": 1,
-                "Identifier": "Spirit.Npi.Ecli.Domain.TypeHr",
-                "level": 1
-            }],
+                       "NodeType": 1,
+                       "Identifier": "Spirit.Npi.Ecli.Domain.TypeHr",
+                       "level": 1
+                       }],
         "PageSize": maximum,
         "Rechtsgebieden": [],
         "SearchTerms": [
@@ -38,6 +38,7 @@ def get_post_data(keyword, maximum=1000):
     }
     return json.dumps(post_data)
 
+
 def get_query_result(keyword):
     post_data = get_post_data(keyword)
     buffer = BytesIO()
@@ -45,7 +46,7 @@ def get_query_result(keyword):
     c = pycurl.Curl()
     c.setopt(c.URL, 'https://uitspraken.rechtspraak.nl/api/zoek')
     c.setopt(pycurl.HTTPHEADER, ['Content-Type: application/json',
-                                'Accept: application/json'])
+                                 'Accept: application/json'])
     c.setopt(c.WRITEDATA, buffer)
     c.setopt(pycurl.POST, 1)
     c.setopt(pycurl.POSTFIELDS, post_data)
@@ -56,6 +57,7 @@ def get_query_result(keyword):
     body = buffer.getvalue()
     result = json.loads(body.decode('utf-8'))
     return result
+
 
 def get_network_from_keyword(keyword, verbose=True):
     result = get_query_result(keyword)
@@ -76,6 +78,7 @@ def get_network_from_keyword(keyword, verbose=True):
                                                          links_json)
     return nodes_json, links_json
 
+
 def links_from_abstract(nodes):
     links = []
     eclis = [node['ecli'] for node in nodes]
@@ -86,14 +89,15 @@ def links_from_abstract(nodes):
                 target = links_to_json.ecli_to_url(ecli)
                 links.append({'source': node['id'],
                               'target': target,
-                             'id': node['id']+'_'+target})
+                             'id': node['id'] + '_' + target})
     return links
+
 
 def result_to_node(result):
     node = {}
     node['id'] = result['DeeplinkUrl']
     node['ecli'] = result['TitelEmphasis']
-    node['creator'] = 'Hoge Raad' # TODO
+    node['creator'] = 'Hoge Raad'  # TODO
     node['title'] = result.get('Titel', node['id'])
     node['abstract'] = result.get('Tekstfragment', '')
     node['date'] = result['Publicatiedatum']
@@ -105,12 +109,12 @@ def result_to_node(result):
     node['year'] = int(node['date'].split('-')[-1])
     node['count_version'] = len(result['Vindplaatsen'])
     node['count_annotation'] = len([c for c in result['Vindplaatsen'] if
-                            c['VindplaatsAnnotator'] != ''])
+                                    c['VindplaatsAnnotator'] != ''])
     # New:
     node['procedure'] = result['Proceduresoorten']
     return node
 
 if __name__ == "__main__":
     keyword = "7:658"
-    nodes_json, links_json = get_network_from_keyword(keyword = keyword)
+    nodes_json, links_json = get_network_from_keyword(keyword=keyword)
     query_to_json.to_sigma_json(nodes_json, links_json, keyword, filename=None)

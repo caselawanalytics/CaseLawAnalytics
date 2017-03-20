@@ -1,6 +1,7 @@
 import networkx as nx
 from networkx.readwrite import json_graph
 
+
 def get_network(nodes, links):
     edges = []
     node_indices = {nodes[i]['id']: i for i in range(len(nodes))}
@@ -35,11 +36,9 @@ def add_network_statistics(nodes, links):
     else:
         statistics = {}
 
-
     for node in nodes:
         nodeid = node['id']
         for var in statistics.keys():
             node[var] = statistics[var][nodeid]
 
     return nodes
-

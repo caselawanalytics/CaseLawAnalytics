@@ -10,6 +10,7 @@ from rdflib.namespace import DCTERMS
 import rdflib
 from rechtspraak_query_app import query_to_json, network_analysis
 
+
 def read_csv(path, sep=',', header='infer'):
     links_df = pd.read_csv(path, sep=sep, header=header)
     links_df.columns = ['id', 'reference']
@@ -40,8 +41,10 @@ def make_graph(links, eclis):
         create_link(source, target, graph)
     return graph, existing_eclis
 
+
 def ecli_to_url(ecli):
     return "http://deeplink.rechtspraak.nl/uitspraak?id={}".format(ecli)
+
 
 def create_link(ecli_from, ecli_to, g):
     url_from = rdflib.URIRef(ecli_to_url(ecli_from))

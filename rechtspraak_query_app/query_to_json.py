@@ -12,6 +12,7 @@ import random
 
 DEFAULT_SPARQL_ENDPOINT = "http://localhost:9999/blazegraph/namespace/hogeraad/sparql"
 
+
 def retrieve_from_sparql(searchstring, sparql):
     # escape quotes in searchstring
     searchstring = searchstring.replace('"', '\\"')
@@ -67,6 +68,7 @@ def retrieve_from_sparql(searchstring, sparql):
     ret = sparql.query()
     nodes_and_links = ret.convert()
     return nodes_and_links
+
 
 def retrieve_predicate_object(pred, obj, sparql):
     # escape quotes in searchstring
@@ -141,6 +143,7 @@ def url_to_ecli(url):
     ecli = url.split('=')[-1]
     return ecli
 
+
 def ecli_to_year(ecli):
     return int(ecli.split(':')[3])
 
@@ -163,7 +166,8 @@ def enrich_nodes(nodes, vindplaatsen, articles):
     # get the keys (case id) and value (article name)
     articles_kv = [(item['id'], item['article']) for item in articles]
     articles_grouped = itertools.groupby(articles_kv, lambda x: x[0])
-    articles_dict = {k: list(set([val[1] for val in g])) for k,g in articles_grouped}
+    articles_dict = {k: list(set([val[1] for val in g]))
+                     for k, g in articles_grouped}
 
     count_version = {}
     count_annotation = {}
@@ -189,15 +193,17 @@ def parse_links(links_in, node_ids):
         target = d['to']
         if target in node_ids:
             dout = {'source': d['id'],
-                    'target': target }
+                    'target': target}
             dout['id'] = dout['source'] + '_' + dout['target']
             if dout['id'] not in unique_link_ids:
                 links_json.append(dout)
                 unique_link_ids.append(dout['id'])
     return links_json
 
+
 def transform_result_item(item):
     return {k: item[k]['value'] for k in item}
+
 
 def query(searchstring, only_linked=True, sparql=None, pred=None, obj=None):
     if sparql is None:
@@ -205,7 +211,7 @@ def query(searchstring, only_linked=True, sparql=None, pred=None, obj=None):
 
     if searchstring is None:
         nodes_and_links = retrieve_predicate_object(pred, obj,
-                                                                  sparql)
+                                                    sparql)
     else:
         nodes_and_links = retrieve_from_sparql(searchstring, sparql)
 
@@ -213,20 +219,22 @@ def query(searchstring, only_linked=True, sparql=None, pred=None, obj=None):
     variables = [x for x in nodes_and_links['head']['vars'] if
                  x not in ['type', 'from', 'to', 'hasVersion', 'article']]
 
-    data = [transform_result_item(item) for item in nodes_and_links['results']['bindings']]
-    nodes = [res for res in data  if res['type'] == 'node']
-    vindplaatsen = [res for res in data  if res['type'] == 'vindplaats']
-    articles = [res for res in data  if res['type'] == 'article']
+    data = [transform_result_item(item)
+            for item in nodes_and_links['results']['bindings']]
+    nodes = [res for res in data if res['type'] == 'node']
+    vindplaatsen = [res for res in data if res['type'] == 'vindplaats']
+    articles = [res for res in data if res['type'] == 'article']
     nodes_json, node_ids = parse_nodes(nodes, variables)
 
     nodes_json = enrich_nodes(nodes_json, vindplaatsen, articles)
 
     # Parse the links
-    links = [res for res in data  if res['type'] == 'link']
+    links = [res for res in data if res['type'] == 'link']
     links_json = parse_links(links, node_ids)
 
     # Add network analysis
-    nodes_json = network_analysis.add_network_statistics(nodes_json, links_json)
+    nodes_json = network_analysis.add_network_statistics(
+        nodes_json, links_json)
 
     # Possibly: remove nodes without link
     if only_linked:
@@ -255,13 +263,14 @@ def to_sigma_json(nodes, links, title, filename=None):
     with open(filename, 'w') as outfile:
         json.dump({'title': title, 'nodes': nodes, 'edges': links}, fp=outfile)
 
+
 def to_csv(nodes, filename=None, variables=None):
     import pandas as pd
     if len(nodes) == 0:
         df = pd.DataFrame()
     else:
         if variables is None:
-            variables  = nodes[0].keys()
+            variables = nodes[0].keys()
         df = pd.DataFrame(nodes).set_index('id')
     if 'abstract' in variables:
         df['abstract'] = df['abstract'].str.replace('\s', ' ')

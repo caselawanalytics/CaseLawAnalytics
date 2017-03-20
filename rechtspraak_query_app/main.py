@@ -10,6 +10,7 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+
 @app.route('/query_links', methods=['POST'])
 def query_links():
     try:
@@ -24,10 +25,11 @@ def query_links():
             graph, existing_eclis = links_to_json.make_graph(links_df, eclis)
             if len(existing_eclis) < len(eclis):
                 difference = set(eclis) - set(existing_eclis)
-                warning = "The following ECLI articles were not found: " + str(difference)
-            if len(graph)==0:
+                warning = "The following ECLI articles were not found: " + \
+                    str(difference)
+            if len(graph) == 0:
                 return render_template("index.html",
-                                error="No resulting matches!")
+                                       error="No resulting matches!")
             nodes, links = links_to_json.graph_to_network(graph)
             network_json = query_to_json.to_sigma_json(nodes, links, title)
             network_csv = query_to_json.to_csv(nodes)
@@ -39,7 +41,8 @@ def query_links():
         print(error)
         traceback.print_exc()
         return render_template("index.html",
-                        error="Sorry, something went wrong!")
+                               error="Sorry, something went wrong!")
+
 
 @app.route('/download-json/', methods=['POST'])
 def download_json():
@@ -47,8 +50,10 @@ def download_json():
     if('network_json' in request.form):
         network_json = request.form['network_json']
     response = make_response(network_json)
-    response.headers["Content-Disposition"] = "attachment; filename=network_json.json"
+    response.headers[
+        "Content-Disposition"] = "attachment; filename=network_json.json"
     return response
+
 
 @app.route('/download-csv/', methods=['POST'])
 def download_csv():
@@ -56,5 +61,6 @@ def download_csv():
     if('network_csv' in request.form):
         network_csv = request.form['network_csv']
     response = make_response(network_csv)
-    response.headers["Content-Disposition"] = "attachment; filename=network_csv.csv"
+    response.headers[
+        "Content-Disposition"] = "attachment; filename=network_csv.csv"
     return response
