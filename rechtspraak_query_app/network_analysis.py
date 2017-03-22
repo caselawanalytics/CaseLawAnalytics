@@ -36,9 +36,12 @@ def add_network_statistics(nodes, links):
     else:
         statistics = {}
 
-    for node in nodes:
+    # for relative in-degree we sort on date
+    nodes.sort(key=lambda k: k['date'], reverse=True)
+    for i, node in enumerate(nodes):
         nodeid = node['id']
         for var in statistics.keys():
             node[var] = statistics[var][nodeid]
+        node['rel_in_degree'] = node['in_degree'] / float(max(i, 1))
 
     return nodes
