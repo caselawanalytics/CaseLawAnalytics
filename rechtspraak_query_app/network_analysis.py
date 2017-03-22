@@ -37,7 +37,8 @@ def add_network_statistics(nodes, links):
         statistics = {}
 
     # for relative in-degree we sort on date
-    nodes.sort(key=lambda k: k['date'], reverse=True)
+    derive_date = lambda k: k['date'] if k['date']!='' else '{}-01-01'.format(k['year'])
+    nodes.sort(key=derive_date, reverse=True)
     for i, node in enumerate(nodes):
         nodeid = node['id']
         for var in statistics.keys():
