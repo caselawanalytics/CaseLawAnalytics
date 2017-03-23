@@ -30,6 +30,8 @@ def add_network_statistics(nodes, links):
             'in_degree_centrality': nx.in_degree_centrality(graph),
             'out_degree_centrality': nx.out_degree_centrality(graph),
             'betweenness_centrality': nx.betweenness_centrality(graph),
+            'closeness_centrality': nx.closeness_centrality(graph),
+            'pagerank': nx.pagerank(graph),
             'hubs': hubs,
             'authorities': authorities
         }
