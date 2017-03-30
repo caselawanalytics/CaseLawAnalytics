@@ -2,10 +2,11 @@ import pycurl
 import json
 import pandas as pd
 from io import BytesIO
+from lxml import etree
 from rechtspraak_query_app import links_to_json, parser, network_analysis, query_to_json
 
 
-def get_post_data(keyword, maximum=1000):
+def get_post_data(keyword, uitspraak_conclusie=['uitspraak'], rechtsgebieden=[], instanties=[], maximum=1000):
     # TODO: add more options
     post_data = {
         "Advanced": {
@@ -13,18 +14,22 @@ def get_post_data(keyword, maximum=1000):
         },
         "Contentsoorten": [{
                            "NodeType": 7,
-                           "Identifier": "uitspraak",
+                           "Identifier": u,
                            "level": 1
-                           }],
+                           } for u in uitspraak_conclusie],
         "DatumPublicatie": [],
         "DatumUitspraak": [],
         "Instanties": [{
                        "NodeType": 1,
-                       "Identifier": "Spirit.Npi.Ecli.Domain.TypeHr",
+                       "Identifier": i,
                        "level": 1
-                       }],
+                       } for i in instanties],
         "PageSize": maximum,
-        "Rechtsgebieden": [],
+        "Rechtsgebieden": [{
+                       "NodeType": 3,
+                       "Identifier": r,
+                       "level": 1
+                       } for r in rechtsgebieden],
         "SearchTerms": [
             {
                 "Field": "AlleVelden",
@@ -37,6 +42,13 @@ def get_post_data(keyword, maximum=1000):
         "StartRow": 0
     }
     return json.dumps(post_data)
+
+
+def get_result_from_rss(rss_url):
+    attributes = rss_url.split('?')[-1]
+    url = 'http://data.rechtspraak.nl/uitspraken/zoeken?' + attributes
+    el = etree.parse(url)
+    root = el.getroot()
 
 
 def get_query_result(keyword):

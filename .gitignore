@@ -6,3 +6,4 @@ test/__pycache__
 .cache
 *.pyc
 .coverage
+rechtspraak_query_app/authentication.json

@@ -1,0 +1,56 @@
+{
+  "Contentsoorten": [
+    {
+      "Identifier": "uitspraak",
+      "Title": "Uitspraak"
+    },
+    {
+      "Identifier": "conclusie",
+      "Title": "Conclusie"
+    }
+	],
+
+  "Rechtsgebieden": [
+    {
+      "Identifier": "http://psi.rechtspraak.nl/rechtsgebied#bestuursrecht",
+      "Title": "Bestuursrecht"
+    },
+    {
+      "Identifier": "http://psi.rechtspraak.nl/rechtsgebied#civielRecht",
+      "Title": "Civiel recht"
+    },
+    {
+      "Identifier": "http://psi.rechtspraak.nl/rechtsgebied#internationaalPubliekrecht",
+      "Title": "Internationaal Publiekrecht"
+    },
+    {
+      "Identifier": "http://psi.rechtspraak.nl/rechtsgebied#strafrecht",
+      "Title": "Strafrecht"
+    }
+  ],
+
+  "Instanties": [
+    {
+        "Identifier": "Spirit.Npi.Ecli.Domain.TypeHr",
+        "Title": "Hoge Raad"
+    }, {
+        "Identifier": "Spirit.Npi.Ecli.Domain.TypeRvS",
+        "Title": "Raad van State"
+    }, {
+        "Identifier": "Spirit.Npi.Ecli.Domain.TypeCRvB",
+        "Title": "Centrale Raad van Beroep"
+    }, {
+        "Identifier": "Spirit.Npi.Ecli.Domain.TypeCBb",
+        "Title": "College van Beroep voor het bedrijfsleven"
+    }, {
+        "Identifier": "Spirit.Npi.Ecli.Domain.Gerechtshof",
+        "Title": "Gerechtshoven"
+    }, {
+        "Identifier": "Spirit.Npi.Ecli.Domain.Rechtbank",
+        "Title": "Rechtbanken"
+    }, {
+        "Identifier": "Spirit.Npi.Ecli.Domain.Koninkrijksinstantie",
+        "Title": "Andere instanties binnen het Koninkrijk"
+    }
+  ]
+}
