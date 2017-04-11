@@ -1,11 +1,9 @@
 *.db
-blazegraph.jnl
-javascript/.idea/*
-rechtspraak_query_app/__pycache__
+caselawnet/__pycache__
+caselawnet.egg-info
 test/__pycache__
 .cache
 *.pyc
 .coverage
-rechtspraak_query_app/authentication.json
 build/
 dist/
