@@ -19,7 +19,9 @@ def get_meta_data(eclis, rootpath=None):
             existing_eclis += [ecli]
         except:
             print("Could not parse: " + ecli)
-
+    
+    if len(existing_eclis)==0:
+        return []
     nodes = graph_to_nodes(graph)
 
     return nodes
