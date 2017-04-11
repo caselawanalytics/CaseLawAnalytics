@@ -8,13 +8,13 @@ with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 setup(
-    name = "rechtspraak_query_app",
+    name = "caselawnet",
     version = "0.1.0",
     description = ("Flask application for querying networks of Dutch case law"),
     license = "Apache 2.0",
     keywords = "Python",
     url = "https://github.com/NLeSC/CaseLawAnalytics",
-    packages=['rechtspraak_query_app', 'rechtspraak_query_app.parser'],
+    packages=['caselawnet'],
     install_requires=required,
     long_description=read('README.md'),
     classifiers=[

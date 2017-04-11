@@ -1,0 +1,16 @@
+setup.py
+caselawnet/__init__.py
+caselawnet/caselawnet.py
+caselawnet/enrich.py
+caselawnet/matcher.py
+caselawnet/network_analysis.py
+caselawnet/parser.py
+caselawnet/search.py
+caselawnet/utils.py
+caselawnet.egg-info/PKG-INFO
+caselawnet.egg-info/SOURCES.txt
+caselawnet.egg-info/dependency_links.txt
+caselawnet.egg-info/requires.txt
+caselawnet.egg-info/top_level.txt
+test/test_parser.py
+test/test_search.py

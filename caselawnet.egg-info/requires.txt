@@ -1,0 +1,10 @@
+networkx
+lxml
+rdflib
+rdflib-jsonld
+pandas
+nltk
+flask
+SPARQLWrapper
+pytest
+pycurl

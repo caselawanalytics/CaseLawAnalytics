@@ -1,14 +1,26 @@
-from . import query_to_json, links_to_json
+import caselawnet
 import traceback
-
+import json
 import io
-from flask import Flask, request, render_template, make_response, send_file
+from flask import Flask, request, render_template, make_response, g
+import pandas as pd
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+def read_csv(path, sep=',', header='infer'):
+    links_df = pd.read_csv(path, sep=sep, header=header)
+    links_df.columns = ['source', 'target']
+    # Strip leading or trailing whitespace
+    links_df.source = links_df.source.str.strip()
+    links_df.target = links_df.target.str.strip()
+    links_df = links_df.drop_duplicates()
+    eclis = list(pd.concat([links_df['source'], links_df['target']]).unique())
+    return links_df, eclis
 
 
 @app.route('/query_links', methods=['POST'])
@@ -20,19 +32,20 @@ def query_links():
         if('links' in request.form):
             links_csv = request.form['links']
             title = request.form.get('title', 'Network')
-            links_df, eclis = links_to_json.read_csv(io.StringIO(links_csv),
+            links_df, eclis = read_csv(io.StringIO(links_csv),
                                                      sep=',', header=None)
-            graph, existing_eclis = links_to_json.make_graph(links_df, eclis)
-            if len(existing_eclis) < len(eclis):
+            links_dict = links_df.to_dict(orient='records')
+            nodes, links = caselawnet.links_to_network(links_dict)
+            if len(nodes) < len(eclis):
+                existing_eclis = [node['ecli'] for node in nodes]
                 difference = set(eclis) - set(existing_eclis)
                 warning = "The following ECLI articles were not found: " + \
                     str(difference)
-            if len(graph) == 0:
+            if len(nodes) == 0:
                 return render_template("index.html",
                                        error="No resulting matches!")
-            nodes, links = links_to_json.graph_to_network(graph)
-            network_json = query_to_json.to_sigma_json(nodes, links, title)
-            network_csv = query_to_json.to_csv(nodes)
+            network_json = caselawnet.to_sigma_json(nodes, links, title)
+            network_csv = caselawnet.to_csv(nodes)
         return render_template("index.html",
                                network_json=network_json,
                                network_csv=network_csv,
@@ -64,3 +77,27 @@ def download_csv():
     response.headers[
         "Content-Disposition"] = "attachment; filename=network_csv.csv"
     return response
+
+
+
+def get_parameter_values():
+    values = getattr(g, '_values', None)
+    if values is None:
+        with open('static/values.json') as f:
+            values = json.load(f)
+        g._values = values
+    return values
+
+@app.route('/search/')
+def search():
+    values = get_parameter_values()
+    return render_template('search.html',
+                           values=values)
+
+@app.route('/search_query/', methods=['POST'])
+def search_query():
+    print(request.form)
+    print(request.form.getlist('Instanties'))
+    values = get_parameter_values()
+    return render_template('search.html',
+                           values=values)

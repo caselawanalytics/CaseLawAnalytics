@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="formpage">
-    <form action="{{url_for('query')}}" method="post">
+    <form action="{{url_for('search_query')}}" method="post">
     {% for parameter in values %}
         <h2>{{parameter}}</h2>
         {% for value in values[parameter] %}

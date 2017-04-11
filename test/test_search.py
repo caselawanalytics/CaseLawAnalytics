@@ -1,4 +1,4 @@
-from rechtspraak_query_app import search
+from caselawnet import search
 import json
 
 def test_get_query_result():

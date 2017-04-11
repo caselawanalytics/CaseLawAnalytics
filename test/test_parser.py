@@ -1,4 +1,4 @@
-from rechtspraak_query_app.parser import parser
+from caselawnet import parser
 from lxml import etree
 from rdflib.namespace import DCTERMS
 

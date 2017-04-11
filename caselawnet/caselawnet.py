@@ -2,7 +2,7 @@
 This module forms the main interface to the functionalities of caselawnet.
 """
 import warnings
-from caselawnet import search, network_analysis
+from caselawnet import search, network_analysis, enrich, utils
 
 def search_keyword(keyword, **args):
     """
@@ -19,13 +19,13 @@ def search_keyword(keyword, **args):
     return nodes
 
 
-def enrich_eclis(eclis):
+def enrich_eclis(eclis, rootpath=None):
     """
     Retrieves meta information for the proviced ECLI identifiers.
     :param eclis: list of ECLI identifiers
     :return: list of rich nodes.
     """
-    nodes = [{'ecli': ecli} for ecli in eclis]
+    nodes = enrich.get_meta_data(eclis, rootpath=rootpath)
 
     return nodes
 
@@ -53,4 +53,32 @@ def get_network(nodes, links):
     """
     nodes = network_analysis.add_network_statistics(nodes, links)
     return nodes, links
+
+
+def enrich_links(links):
+    """
+    Makes a list of link dictionaries suitable for network.
+
+    :param links: list of dict with at least 'source' and 'target',
+        that should contain ECLI identifiers
+    :return: list of dict with links
+    """
+    return enrich.enrich_links(links)
+
+def links_to_network(links):
+    """
+    Creates nodes and links of a network from a list with dictionaries
+    that contain 'source' and 'target' attributes of known links
+
+    :param links: list of dict with at least 'source' and 'target'
+    :return: nodes, links_out: network with these links
+    """
+    eclis = list(set([l['source'] for l in links] +
+                     [l['target'] for l in links]))
+    nodes = enrich_eclis(eclis)
+
+    links = enrich_links(links)
+
+    nodes, links_out = get_network(nodes, links)
+    return nodes, links_out
 
