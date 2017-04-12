@@ -2,7 +2,7 @@ import itertools
 from lxml import etree
 import os
 import re
-from caselawnet import matcher, utils, parser
+from . import matcher, utils, parser
 import caselawnet
 import pandas as pd
 from rdflib import Graph

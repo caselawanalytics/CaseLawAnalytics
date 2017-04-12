@@ -17,6 +17,8 @@ def get_network(nodes, links):
 
 
 def add_network_statistics(nodes, links):
+    if len(nodes)==0:
+        return nodes
     graph = get_network(nodes, links)
     degree = nx.degree(graph)
     if max(degree.values()) > 0:

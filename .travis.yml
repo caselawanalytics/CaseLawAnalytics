@@ -24,6 +24,6 @@ install:
 
 # command to run tests, e.g. python setup.py test
 script: 
-- py.test --cov=rechtspraak_query_app test/
+- py.test --cov=caselawnet test/
 
  

@@ -2,7 +2,7 @@
 This module forms the main interface to the functionalities of caselawnet.
 """
 import warnings
-from caselawnet import search, network_analysis, enrich, utils
+from . import search, network_analysis, enrich, utils
 
 def search_keyword(keyword, **args):
     """

@@ -3,7 +3,7 @@ import json
 import pandas as pd
 from io import BytesIO
 from lxml import etree
-from caselawnet import matcher, utils, network_analysis
+from . import matcher, utils, network_analysis
 
 
 def get_post_data(keyword, uitspraak_conclusie=['uitspraak'], rechtsgebieden=[], instanties=[], maximum=1000):
