@@ -2,10 +2,15 @@ import caselawnet
 import traceback
 import json
 import io
-from flask import Flask, request, render_template, make_response, g
+from flask import Flask, request, render_template, make_response, g, send_from_directory
 import pandas as pd
+import random
+import os
 app = Flask(__name__)
 
+UPLOAD_FOLDER = '/tmp/'
+ALLOWED_EXTENSIONS = set(['json', 'csv'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def index():
@@ -22,6 +27,11 @@ def read_csv(path, sep=',', header='infer'):
     eclis = list(pd.concat([links_df['source'], links_df['target']]).unique())
     return links_df, eclis
 
+def save_result(data, extension):
+    name = '%030x' % random.randrange(16 ** 30) + '.' + extension
+    with open(os.path.join(app.config['UPLOAD_FOLDER'], name), 'w') as fn:
+        fn.write(data)
+    return name
 
 @app.route('/query_links', methods=['POST'])
 def query_links():
@@ -39,16 +49,22 @@ def query_links():
             if len(nodes) < len(eclis):
                 existing_eclis = [node['ecli'] for node in nodes]
                 difference = set(eclis) - set(existing_eclis)
-                warning = "The following ECLI articles were not found: " + \
+                warning = "The following ECLI cases were not found: " + \
                     str(difference)
             if len(nodes) == 0:
                 return render_template("index.html",
                                        error="No resulting matches!")
             network_json = caselawnet.to_sigma_json(nodes, links, title)
             network_csv = caselawnet.to_csv(nodes)
+
+            json_file = save_result(network_json, 'json')
+            csv_file = save_result(network_csv, 'csv')
+            print(json_file, csv_file)
         return render_template("index.html",
                                network_json=network_json,
                                network_csv=network_csv,
+                               json_file=json_file,
+                               csv_file=csv_file,
                                warning=warning)
     except Exception as error:
         print(error)
@@ -56,6 +72,14 @@ def query_links():
         return render_template("index.html",
                                error="Sorry, something went wrong!")
 
+@app.route('/downloads/<filename>')
+def download_file(filename):
+    fn, ext = os.path.splitext(filename)
+    filename_out = 'network' + ext
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename,
+                               as_attachment=True,
+                               attachment_filename=filename_out)
 
 @app.route('/download-json/', methods=['POST'])
 def download_json():

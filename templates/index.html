@@ -33,18 +33,24 @@
 
         <div class="form">
             <h2>Result</h2>
-            {% if network_json %}
-                <form action="{{url_for('download_json')}}" method="post">
-                    <textarea  rows="10" cols="50" class="network_output" name="network_json"> {{ network_json }}</textarea>
+            <dl>
+
+                {% if json_file %}
+                <dd>
+                <form action="{{url_for('download_file', filename=json_file)}}">
                     <input type="submit" value="Download JSON">
                 </form>
+                </dd>
             {% endif %}
-            {% if network_csv %}
-                <form action="{{url_for('download_csv')}}" method="post">
-                    <textarea  rows="10" cols="50" class="network_output" name="network_csv"> {{ network_csv }}</textarea>
-                    <input type="submit" value="Download CSV">
-                </form>
+            {% if csv_file %}
+                <dd>
+                    <form action="{{url_for('download_file', filename=csv_file)}}">
+                        <input type="submit" value="Download CSV">
+                    </form>
+                </dd>
             {% endif %}
+            </dl>
+
 
         </div>
 
