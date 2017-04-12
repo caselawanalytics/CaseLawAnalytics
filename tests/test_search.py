@@ -9,7 +9,7 @@ def test_get_query_result():
 
 
 def test_result_to_node():
-    with open('test/test_ecli.json') as f:
+    with open('tests/test_ecli.json') as f:
         result = json.load(f)
     node = search.result_to_node(result)
     assert node['id'] == 'http://deeplink.rechtspraak.nl/uitspraak?id=ECLI:NL:HR:2015:295'
