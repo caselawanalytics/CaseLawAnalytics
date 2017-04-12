@@ -29,9 +29,10 @@ def get_article_regex():
 
 def get_articles(text):
     """
+    Matches article references in the text with a heuristic regex.
 
-    :param text:
-    :return:
+    :param text: str of text
+    :return: dict with (art_nr, art_name) keys, count values
     """
     if type(text) == str :
         text = nltk.Text(nltk.word_tokenize(text.lower()))

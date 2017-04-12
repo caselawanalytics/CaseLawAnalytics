@@ -13,3 +13,11 @@ def test_links_to_network():
     nodes, links = caselawnet.links_to_network(links)
     assert len(nodes) == 2
     assert len(links) == 1
+
+
+def test_search_keyword():
+    keyword = 'ECLI:NL:HR:2009:BF0003'
+    nodes = caselawnet.search_keyword(keyword)
+    assert len(nodes) > 0
+    assert 'id' in nodes[0]
+    assert 'ecli' in nodes[0]
