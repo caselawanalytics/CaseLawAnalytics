@@ -5,8 +5,14 @@ def test_get_articles_empty():
     articles = matcher.get_articles(text)
     assert len(articles) == 0
 
-def test_get_articles():
-    text = 'art. 1:23 BWB'
+def test_get_articles_1():
+    text = 'art. 7:658 BW'
     articles = matcher.get_articles(text)
     assert len(articles) == 1
-    assert ('1:23', 'bwb') in articles
+    assert ('7:658', 'bw') in articles
+
+def test_get_articles_2():
+    text = 'Artikel 10:11 Awb'
+    articles = matcher.get_articles(text)
+    assert len(articles) == 1
+    assert ('10:11', 'awb') in articles
