@@ -1,7 +1,7 @@
 *.db
 caselawnet/__pycache__
 caselawnet.egg-info
-test/__pycache__
+tests/__pycache__
 .cache
 *.pyc
 .coverage

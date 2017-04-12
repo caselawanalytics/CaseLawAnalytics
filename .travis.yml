@@ -22,8 +22,8 @@ before_install:
 install:
 - "echo done"
 
-# command to run tests, e.g. python setup.py test
+# command to run tests, e.g. python setup.py tests
 script: 
-- py.test --cov=caselawnet test/
+- py.test --cov=caselawnet tests/
 
  
