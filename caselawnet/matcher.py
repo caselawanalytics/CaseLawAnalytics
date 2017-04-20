@@ -12,6 +12,7 @@ These are names of common law bookds
 
 import re
 import nltk
+nltk.download('punkt')
 from collections import Counter
 
 def get_article_regex():
