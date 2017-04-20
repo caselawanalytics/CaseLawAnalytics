@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="formpage">
+    <form action="{{url_for('search_query')}}" method="post">
+    {% for parameter in values %}
+        <h2>{{parameter}}</h2>
+        {% for value in values[parameter] %}
+            <input type="checkbox" name="{{parameter}}" value="{{ value.Identifier }}">{{ value.Title }}<br>
+          {% endfor %}
+    {% endfor %}
+        <dd><input type="submit" value="Search">
+    </form>
+</div>
+</body>
+</html>

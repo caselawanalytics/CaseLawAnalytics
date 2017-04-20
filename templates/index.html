@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Case Law Querier</title>
+</head>
+<body>
+    <h1 class="title">Case Law Querier</h1>
+    <p>This application is developed for the <a href="https://www.esciencecenter.nl/project/case-law-analytics">Case Law Analytics project</a> by Maastricht University
+        and the <a href="https://www.esciencecenter.nl/">Netherlands eScience Center</a>.
+        Source code is available at <a href="https://github.com/NLeSC/CaseLawAnalytics">github</a>.
+    </p>
+    <p>
+        This application can be used to obtain a json file for the <a href="https://nlesc.github.io/case-law-app/">case law visualization app</a>.
+        It also outputs a csv file with network analysis variables, to analyze in e.g. excel or <a href="http://nlesc.github.io/">SPOT</a>.
+    </p>
+    <div class="formpage">
+          {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
+          {% if warning %}<p class="error"><strong>Warning:</strong> {{ warning }}{% endif %}
+        <div class="form">
+            <h2>Search by list of links</h2>
+            <form action="{{ url_for('query_links') }}" method="post">
+            <dl>
+              <dt>Title:
+              <dd><input type="text" name="title">
+              <dt>Provide ECLI identifiers for the links. Each line should contain two ECLI identifiers (source and target), separated by a comma.
+              <dd>  <textarea  rows="10" cols="50" class="links_csv" name="links"></textarea>
+                <dd><input type="submit" value="Search">
+            </dl>
+          </form>
+        </div>
+
+        <div class="form">
+            <h2>Result</h2>
+
+                {% if json_file %}
+                <div class="button">
+                <form action="{{url_for('download_file', filename=json_file)}}">
+                    <input type="submit" value="Download JSON">
+                </form>
+                </div>
+            {% endif %}
+            {% if csv_file %}
+                <div class="button">
+                    <form action="{{url_for('download_file', filename=csv_file)}}">
+                        <input type="submit" value="Download CSV">
+                    </form>
+                </div>
+            {% endif %}
+
+
+        </div>
+
+    </div>
+</body>
+</html>
