@@ -112,13 +112,13 @@ def get_parameter_values():
         g._values = values
     return values
 
-@app.route('/search/')
+#@app.route('/search/')
 def search():
     values = get_parameter_values()
     return render_template('search.html',
                            values=values)
 
-@app.route('/search_query/', methods=['POST'])
+#@app.route('/search_query/', methods=['POST'])
 def search_query():
     print(request.form)
     print(request.form.getlist('Instanties'))
