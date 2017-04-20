@@ -3,46 +3,42 @@
 # CaseLawAnalytics
 This repository contains code for the case law query app: an application to query Dutch law cases and extract a network to use in the [case law visualization app](https://github.com/NLeSC/case-law-app).
 
-It includes code for setting up a blazegraph instance with "Hoge Raad" (high court) cases from [Rechtspraak.nl](https://www.rechtspraak.nl). This is not a requirement for a working query app.
-
 This code is still under development.
 
 Prerequisites:
 * Python 3
 
-Install the python requirents with `pip install -r requirements.txt`.
+## The python package
+The python package `caselawnet` provides the following main functionalities:
+* Search the [rechtspraak.nl](https://www.rechtspraak.nl/) api to retrieve 
+  relevant law cases.
+* Retrieve metadata from [rechtspraak.nl](https://www.rechtspraak.nl/) for a 
+  list of cases (given their ECLI identifier)
+* (Future: retrieve references between cases from [LiDO](http://linkeddata.overheid.nl/front/portal/lido))
+* Calculate network statistics and create json file that can be used in the
+  [case law visualization app](https://github.com/NLeSC/case-law-app).
 
 
-## The query app
-First, clone the repository and run in the root of the repository:
+To install `caselawnet`, clone the repository and run in the root of the repository:
 
 `pip install .`
 
-To run the query app:
+To run tests:
 
-`export FLASK_APP=rechtspraak_query_app/main.py`
+`pytest tests/`
+
+
+
+## The web app
+The web application provides a graphical user interface to the caselawnet package.
+
+To run the web app:
+
+`export FLASK_APP=caselawnet_webapp.py`
 
 and run the app:
 
 `flask run`
 
-To run tests:
-
-`pytest test/`
-
-## Blazegraph
-Prerequisites: 
-* Java 7
-
-First, download the [Blazegraph executable jar](http://sourceforge.net/projects/bigdata/files/bigdata/2.1.4/blazegraph.jar/).
-
-Modify the property `com.bigdata.journal.AbstractJournal.file` in the file `[CaseLawAnalytics repository]/blazegraph/RWStore.properties` to indicate where Blazegraph should store the .jnl file containing the data.
-Then, run blazegraph with the properties file included in this repository:
-
-`java -server -Xmx4g -Dbigdata.propertyFile=<path_to_repo>/blazegraph/RWStore.properties -jar blazegraph.jar `
 
 
-### Load data into Blazegraph
-The code for parsing the data from rechtspraak.nl and loading it into blazegraph can be found in `rechtspraak_query_app.parser`. Run the script `scripts/populate_blazegraph` to store all 'Hoge Raad' cases in Blazegraph.
-
-To not overload the rechtspraak.nl server, it is best to first download the [complete collection of rechtspraak.nl](http://static.rechtspraak.nl/PI/OpenDataUitspraken.zip). 
