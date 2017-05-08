@@ -1,5 +1,6 @@
 import random
 import json
+import re
 
 def ecli_to_url(ecli):
     return "http://deeplink.rechtspraak.nl/uitspraak?id={}".format(ecli)
@@ -12,6 +13,12 @@ def url_to_ecli(url):
 
 def ecli_to_year(ecli):
     return int(ecli.split(':')[3])
+
+
+def is_valid_ecli(s):
+    ecli_regex = r'ECLI:[A-Z]{2}:[A-Z]*:[0-9]{4}:[0-9A-Z\.]{1,25}$'
+    upper_s = str.upper(s)
+    return (re.match(ecli_regex, upper_s) is not None)
 
 
 def to_d3_json(nodes, links, filename):
