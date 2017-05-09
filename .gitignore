@@ -8,3 +8,4 @@ tests/__pycache__
 build/
 dist/
 caselawnet/bin/
+rechtspraak.db

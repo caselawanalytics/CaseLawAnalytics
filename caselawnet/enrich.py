@@ -2,28 +2,47 @@ import itertools
 from lxml import etree
 import os
 import re
-from . import matcher, utils, parser
+from . import matcher, utils, parser, dbutils
 import caselawnet
 import pandas as pd
 from rdflib import Graph
 import warnings
 
 
-def get_meta_data(eclis, rootpath=None):
+def get_meta_data(eclis, rootpath=None, dbpath=None):
     existing_eclis = []
+    nodes = []
+
+    # Try setting up the database
+    db = None
+    if dbpath is None:
+        dbpath = caselawnet.rechtspraak_dbpath()
+    if dbpath is not None:
+        db = dbutils.connect_db(dbpath)
+
     graph = Graph()
+
     for ecli in eclis:
         try:
-            element = retrieve_from_any(ecli, rootpath=rootpath)
-            graph += parser.parse_xml_element(element, ecli)
+            # First try database
+            node = retrieve_from_db(ecli, db)
+            if node is None:
+                element = retrieve_from_any(ecli, rootpath=rootpath)
+                graph += parser.parse_xml_element(element, ecli)
+            else :
+                nodes.append(node)
             existing_eclis += [ecli]
-        except:
-            print("Could not parse: " + ecli)
+        except Exception as e:
+            print("Could not parse: " + ecli, e)
     
     if len(existing_eclis)==0:
         return []
-    nodes = graph_to_nodes(graph)
+    # TODO: what are the vindplaatsen and articles?
+    if len(graph)>0:
+        nodes.extend(graph_to_nodes(graph))
 
+    if db is not None:
+        db.close()
     return nodes
 
 def enrich_links(links):
@@ -42,12 +61,12 @@ def enrich_links(links):
 ##################################
 # Functions for retrieving complete xml documents
 ##################################
-def retrieve_from_web(ecli):
+def retrieve_xml_from_web(ecli):
     link = 'http://data.rechtspraak.nl/uitspraken/content?id={}'.format(ecli)
     return etree.ElementTree().parse(link)
 
 
-def retrieve_from_filesystem(ecli, rootpath):
+def retrieve_xml_from_filesystem(ecli, rootpath):
     year = ecli[11:15]
     fn = str(year) + '/' + re.sub(':', '_', ecli) + '.xml'
     path = os.path.join(rootpath, fn)
@@ -56,24 +75,32 @@ def retrieve_from_filesystem(ecli, rootpath):
     except Exception as e:
         return None
 
-def retrieve_from_any(ecli, rootpath=None):
+def retrieve_from_db(ecli, db):
+    if db is not None:
+        node = dbutils.retrieve_ecli(ecli, db)
+        if node is not None:
+            node = enrich_nodes([node], [], [])[0]
+        return node
+    return None
+
+def retrieve_from_any(ecli, rootpath=None, db=None):
     """
-    Checks if it can find the xml document in the filesystem,
+    Checks if it can find the xml document in the db or filesystem,
     otherwise retrieves it from the web.
 
     :param ecli:
     :param rootpath:
-    :return:
+    :return: xml element
     """
     el = None
     if rootpath is None:
         rootpath = caselawnet.rechtspraak_datapath()
 
     if rootpath is not None:
-        el = retrieve_from_filesystem(ecli, rootpath)
+        el = retrieve_xml_from_filesystem(ecli, rootpath)
     if el is None:
         try:
-            el = retrieve_from_web(ecli)
+            el = retrieve_xml_from_web(ecli)
         except Exception as e:
             el = None
     return el
