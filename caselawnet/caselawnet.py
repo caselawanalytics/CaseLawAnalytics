@@ -22,6 +22,8 @@ def search_keyword(keyword, **args):
 def enrich_eclis(eclis, rootpath=None):
     """
     Retrieves meta information for the proviced ECLI identifiers.
+    If there is no meta information found, empty fields are provided.
+
     :param eclis: list of ECLI identifiers
     :return: list of rich nodes.
     """

@@ -9,6 +9,9 @@ from rdflib import Graph
 import warnings
 
 
+node_variables = ['id', 'title', 'creator', 'date', 'subject', 'abstract']
+node_extra_variables = ['year', 'count_version', 'count_annotation']
+
 def get_meta_data(eclis, rootpath=None, dbpath=None):
     existing_eclis = []
     nodes = []
@@ -23,6 +26,7 @@ def get_meta_data(eclis, rootpath=None, dbpath=None):
     graph = Graph()
 
     for ecli in eclis:
+        #TODO check if its a valid ecli, otherwise throw error
         try:
             # First try database
             node = retrieve_from_db(ecli, db)
@@ -30,13 +34,18 @@ def get_meta_data(eclis, rootpath=None, dbpath=None):
                 element = retrieve_from_any(ecli, rootpath=rootpath)
                 graph += parser.parse_xml_element(element, ecli)
             else :
+                print('Retrieved {} from database'.format(ecli))
                 nodes.append(node)
             existing_eclis += [ecli]
         except Exception as e:
-            print("Could not parse: " + ecli, e)
+            # Add empty node
+            print("Could not retrieve: " + ecli, e)
+            node = {k: '' for k in node_variables + node_extra_variables}
+            node['ecli'] = ecli
+            node['id'] = utils.ecli_to_url(ecli)
+            nodes.append(node)
     
-    if len(existing_eclis)==0:
-        return []
+
     # TODO: what are the vindplaatsen and articles?
     if len(graph)>0:
         nodes.extend(graph_to_nodes(graph))
@@ -101,8 +110,11 @@ def retrieve_from_any(ecli, rootpath=None, db=None):
     if el is None:
         try:
             el = retrieve_xml_from_web(ecli)
+            print('Retrieved {} from web'.format(ecli))
         except Exception as e:
             el = None
+    else:
+        print('Retrieved {} from file system'.format(ecli))
     return el
 
 
@@ -168,7 +180,7 @@ def graph_to_nodes(graph):
     vindplaatsen = [x for x in res_list if x['type'] == 'vindplaats']
     articles = [x for x in res_list if x['type'] == 'article']
 
-    variables = ['id', 'title', 'creator', 'date', 'subject', 'abstract']
+    variables = node_variables
     nodes_json, node_ids = parse_nodes(nodes, variables)
     nodes_json = enrich_nodes(nodes_json, vindplaatsen, articles)
 

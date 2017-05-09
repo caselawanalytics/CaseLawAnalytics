@@ -22,8 +22,8 @@ def test_links_to_network_invalid():
     links = [{'source': 'NONEXISTENT_A',
               'target': 'NONEXISTENT_B'}]
     nodes, links = caselawnet.links_to_network(links)
-    assert len(nodes) == 0
-    #assert len(links) == 0
+    assert len(nodes) == 2
+    assert len(links) == 1
 
 
 
