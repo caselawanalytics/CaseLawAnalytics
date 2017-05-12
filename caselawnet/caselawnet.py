@@ -19,7 +19,7 @@ def search_keyword(keyword, **args):
     return nodes
 
 
-def enrich_eclis(eclis, rootpath=None, db=None):
+def enrich_eclis(eclis, rootpath=None, db_session=None):
     """
     Retrieves meta information for the proviced ECLI identifiers.
     If there is no meta information found, empty fields are provided.
@@ -29,7 +29,7 @@ def enrich_eclis(eclis, rootpath=None, db=None):
     :param db: database connection
     :return: list of rich nodes.
     """
-    nodes = enrich.get_meta_data(eclis, rootpath=rootpath, db=db)
+    nodes = enrich.get_meta_data(eclis, rootpath=rootpath, db_session=db_session)
 
     return nodes
 
@@ -69,17 +69,18 @@ def enrich_links(links):
     """
     return enrich.enrich_links(links)
 
-def links_to_network(links, db=None):
+def links_to_network(links, db_session=None):
     """
     Creates nodes and links of a network from a list with dictionaries
     that contain 'source' and 'target' attributes of known links
 
     :param links: list of dict with at least 'source' and 'target'
+    :param db_session: sqlalchemy database session
     :return: nodes, links_out: network with these links
     """
     eclis = list(set([l['source'] for l in links] +
                      [l['target'] for l in links]))
-    nodes = enrich_eclis(eclis, db=db)
+    nodes = enrich_eclis(eclis, db_session=db_session)
 
     links = enrich_links(links)
 

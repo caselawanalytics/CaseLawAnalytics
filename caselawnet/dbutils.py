@@ -3,6 +3,8 @@ import os
 import zipfile
 from lxml import etree
 from . import enrich, parser
+import sqlalchemy
+from sqlalchemy.orm import sessionmaker
 
 schema = """
 drop table if exists cases;
@@ -37,12 +39,23 @@ def init_db(dbpath, filepath):
     db.commit()
     fill_db(db, filepath)
 
+    
+def get_session(adress):
+    db = sqlalchemy.create_engine(adress)
+    Session = sessionmaker(bind=db)
+    return Session()
 
-def retrieve_ecli(ecli, db):
-    query = 'Select * from cases where ecli=?'
-    cursor = db.execute(query, (ecli,))
-    field_names = [d[0] for d in cursor.description]
-    results = cursor.fetchall()
+def retrieve_ecli(ecli, db_session):
+    """
+    Retrieves the ecli from a database
+    
+    :param ecli: The ECLI identifier
+    :param db_session: a sqlalchemy session object
+    """
+    res = db_session.execute('select * from cases where ecli=:ecli', 
+                                {"ecli":ecli})
+    field_names = res.keys()
+    results = res.fetchall()
     if len(results)>0:
         return {field_names[i]: results[0][i] for i in range(len(field_names))}
     else:

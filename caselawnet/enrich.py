@@ -12,7 +12,7 @@ import warnings
 node_variables = ['id', 'title', 'creator', 'date', 'subject', 'abstract']
 node_extra_variables = ['year', 'count_version', 'count_annotation']
 
-def get_meta_data(eclis, rootpath=None, db=None):
+def get_meta_data(eclis, rootpath=None, db_session=None):
     existing_eclis = []
     nodes = []
 
@@ -22,7 +22,7 @@ def get_meta_data(eclis, rootpath=None, db=None):
         #TODO check if its a valid ecli, otherwise throw error
         try:
             # First try database
-            node = retrieve_from_db(ecli, db)
+            node = retrieve_from_db(ecli, db_session)
             if node is None:
                 element = retrieve_from_any(ecli, rootpath=rootpath)
                 graph += parser.parse_xml_element(element, ecli)
@@ -75,9 +75,9 @@ def retrieve_xml_from_filesystem(ecli, rootpath):
     except Exception as e:
         return None
 
-def retrieve_from_db(ecli, db):
-    if db is not None:
-        node = dbutils.retrieve_ecli(ecli, db)
+def retrieve_from_db(ecli, db_session):
+    if db_session is not None:
+        node = dbutils.retrieve_ecli(ecli, db_session)
         if node is not None:
             node = enrich_nodes([node], [], [])[0]
         return node
@@ -85,7 +85,7 @@ def retrieve_from_db(ecli, db):
 
 def retrieve_from_any(ecli, rootpath=None):
     """
-    Checks if it can find the xml document in the db or filesystem,
+    Checks if it can find the xml document in the filesystem,
     otherwise retrieves it from the web.
 
     :param ecli:
