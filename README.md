@@ -32,6 +32,12 @@ To run tests:
 ## The web app
 The web application provides a graphical user interface to the caselawnet package.
 
+Copy the settings file:
+
+`cp settings.cfg_dist settings.cfg`
+
+If necessary, configure attributes in the config file, such as database.
+
 To run the web app:
 
 `export FLASK_APP=caselawnet_webapp.py`
@@ -39,6 +45,8 @@ To run the web app:
 and run the app:
 
 `flask run`
+
+The app runs much quicker if it connects to a database with the parsed cases. __To Do__ : Document how to create this database
 
 
 
