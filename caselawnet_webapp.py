@@ -6,11 +6,26 @@ from flask import Flask, request, render_template, make_response, g, send_from_d
 import pandas as pd
 import random
 import os
+from caselawnet import dbutils
 app = Flask(__name__)
 
 UPLOAD_FOLDER = '/tmp/'
 ALLOWED_EXTENSIONS = set(['json', 'csv'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+DBPATH = 'mysql+mysqldb://caselawapp:abc@localhost/caselaw'
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = dbutils.get_session(DBPATH)
+    return db
+    
+    
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 @app.route('/')
 def index():
@@ -45,7 +60,7 @@ def query_links():
             links_df, eclis = read_csv(io.StringIO(links_csv),
                                                      sep=',', header=None)
             links_dict = links_df.to_dict(orient='records')
-            nodes, links = caselawnet.links_to_network(links_dict)
+            nodes, links = caselawnet.links_to_network(links_dict, db_session=get_db())
             if len(nodes) < len(eclis):
                 existing_eclis = [node['ecli'] for node in nodes]
                 difference = set(eclis) - set(existing_eclis)
@@ -125,3 +140,6 @@ def search_query():
     values = get_parameter_values()
     return render_template('search.html',
                            values=values)
+    
+if __name__ == '__main__':
+    app.run(debug=True)
