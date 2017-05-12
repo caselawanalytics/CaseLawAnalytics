@@ -1,0 +1,24 @@
+##
+## Database settings
+##
+
+## Use No Database
+DBPATH = None
+
+# Use SQLite database
+#DBPATH = 'sqlite:///<FILL IN>.db'
+
+## Use MySQL database
+#DBPATH = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
+#    username="<FILL IN>",
+#    password="<FILL IN>",
+#    hostname="<FILL IN>",
+#    databasename="<FILL IN>",
+#)
+
+##
+## Other settings
+##
+
+## Directory for temporary files:
+UPLOAD_FOLDER = '/tmp/'

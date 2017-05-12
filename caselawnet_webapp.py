@@ -9,15 +9,15 @@ import os
 from caselawnet import dbutils
 app = Flask(__name__)
 
-UPLOAD_FOLDER = '/tmp/'
+
 ALLOWED_EXTENSIONS = set(['json', 'csv'])
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-DBPATH = 'mysql+mysqldb://caselawapp:abc@localhost/caselaw'
+app.config.from_pyfile('settings.cfg')
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = dbutils.get_session(DBPATH)
+        if app.config['DBPATH'] is not None:
+            db = g._database = dbutils.get_session(app.config['DBPATH'])
     return db
     
     
