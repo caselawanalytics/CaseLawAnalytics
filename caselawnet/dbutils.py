@@ -20,7 +20,6 @@ create table cases (
 def connect_db(dbpath='caselaw.db'):
     """Connects to the specific database."""
     rv = sqlite3.connect(dbpath)
-    rv.row_factory = sqlite3.Row
     return rv
 
 
@@ -41,9 +40,11 @@ def init_db(dbpath, filepath):
 
 def retrieve_ecli(ecli, db):
     query = 'Select * from cases where ecli=?'
-    results = db.execute(query, (ecli,)).fetchall()
+    cursor = db.execute(query, (ecli,))
+    field_names = [d[0] for d in cursor.description]
+    results = cursor.fetchall()
     if len(results)>0:
-        return dict(results[0])
+        return {field_names[i]: results[0][i] for i in range(len(field_names))}
     else:
         return None
 

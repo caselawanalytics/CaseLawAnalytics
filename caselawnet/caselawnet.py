@@ -19,15 +19,17 @@ def search_keyword(keyword, **args):
     return nodes
 
 
-def enrich_eclis(eclis, rootpath=None):
+def enrich_eclis(eclis, rootpath=None, db=None):
     """
     Retrieves meta information for the proviced ECLI identifiers.
     If there is no meta information found, empty fields are provided.
 
     :param eclis: list of ECLI identifiers
+    :param rootpath: directory containing data
+    :param db: database connection
     :return: list of rich nodes.
     """
-    nodes = enrich.get_meta_data(eclis, rootpath=rootpath)
+    nodes = enrich.get_meta_data(eclis, rootpath=rootpath, db=db)
 
     return nodes
 
@@ -67,7 +69,7 @@ def enrich_links(links):
     """
     return enrich.enrich_links(links)
 
-def links_to_network(links):
+def links_to_network(links, db=None):
     """
     Creates nodes and links of a network from a list with dictionaries
     that contain 'source' and 'target' attributes of known links
@@ -77,7 +79,7 @@ def links_to_network(links):
     """
     eclis = list(set([l['source'] for l in links] +
                      [l['target'] for l in links]))
-    nodes = enrich_eclis(eclis)
+    nodes = enrich_eclis(eclis, db=db)
 
     links = enrich_links(links)
 

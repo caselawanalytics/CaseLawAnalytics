@@ -12,16 +12,9 @@ import warnings
 node_variables = ['id', 'title', 'creator', 'date', 'subject', 'abstract']
 node_extra_variables = ['year', 'count_version', 'count_annotation']
 
-def get_meta_data(eclis, rootpath=None, dbpath=None):
+def get_meta_data(eclis, rootpath=None, db=None):
     existing_eclis = []
     nodes = []
-
-    # Try setting up the database
-    db = None
-    if dbpath is None:
-        dbpath = caselawnet.rechtspraak_dbpath()
-    if dbpath is not None:
-        db = dbutils.connect_db(dbpath)
 
     graph = Graph()
 
@@ -49,9 +42,7 @@ def get_meta_data(eclis, rootpath=None, dbpath=None):
     # TODO: what are the vindplaatsen and articles?
     if len(graph)>0:
         nodes.extend(graph_to_nodes(graph))
-
-    if db is not None:
-        db.close()
+        
     return nodes
 
 def enrich_links(links):
@@ -92,7 +83,7 @@ def retrieve_from_db(ecli, db):
         return node
     return None
 
-def retrieve_from_any(ecli, rootpath=None, db=None):
+def retrieve_from_any(ecli, rootpath=None):
     """
     Checks if it can find the xml document in the db or filesystem,
     otherwise retrieves it from the web.
@@ -102,8 +93,6 @@ def retrieve_from_any(ecli, rootpath=None, db=None):
     :return: xml element
     """
     el = None
-    if rootpath is None:
-        rootpath = caselawnet.rechtspraak_datapath()
 
     if rootpath is not None:
         el = retrieve_xml_from_filesystem(ecli, rootpath)
