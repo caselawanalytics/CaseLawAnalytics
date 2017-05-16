@@ -69,7 +69,7 @@ def enrich_links(links):
     """
     return enrich.enrich_links(links)
 
-def links_to_network(links, db_session=None):
+def links_to_network(links, rootpath=None, db_session=None):
     """
     Creates nodes and links of a network from a list with dictionaries
     that contain 'source' and 'target' attributes of known links
@@ -80,7 +80,7 @@ def links_to_network(links, db_session=None):
     """
     eclis = list(set([l['source'] for l in links] +
                      [l['target'] for l in links]))
-    nodes = enrich_eclis(eclis, db_session=db_session)
+    nodes = enrich_eclis(eclis, rootpath=rootpath, db_session=db_session)
 
     links = enrich_links(links)
 

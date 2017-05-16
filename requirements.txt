@@ -7,3 +7,4 @@ flask
 pytest
 pycurl
 sqlalchemy
+python-louvain

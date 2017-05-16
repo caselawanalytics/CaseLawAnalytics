@@ -1,6 +1,6 @@
 import networkx as nx
 from networkx.readwrite import json_graph
-
+import community
 
 def get_network(nodes, links):
     edges = []
@@ -15,6 +15,11 @@ def get_network(nodes, links):
                                        directed=True, multigraph=False)
     return graph
 
+def get_community(graph, nodes):
+    graph_u = nx.Graph(graph)
+    partition = community.best_partition(graph_u)
+    for node in nodes:
+        node['community'] = str(partition[node['id']])
 
 def add_network_statistics(nodes, links):
     if len(nodes)==0:
@@ -48,5 +53,5 @@ def add_network_statistics(nodes, links):
         for var in statistics.keys():
             node[var] = statistics[var][nodeid]
         node['rel_in_degree'] = node['in_degree'] / float(max(i, 1))
-
+    get_community(graph, nodes)
     return nodes
