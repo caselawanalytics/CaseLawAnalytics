@@ -7,12 +7,12 @@ from sqlalchemy.orm import sessionmaker
 
 schema = """
 create table if not exists cases (
-  ecli text primary key,
-  id text not null,
-  title text,
-  creator text,
-  date text,
-  subject text,
+  ecli varchar(100) primary key,
+  id varchar(200) not null,
+  title varchar(200),
+  creator varchar(200),
+  date char(10),
+  subject varchar(200),
   abstract text
 );
 """
