@@ -1,4 +1,3 @@
-from sqlite3 import dbapi2 as sqlite3
 import os
 import zipfile
 from lxml import etree
@@ -7,8 +6,7 @@ import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 
 schema = """
-drop table if exists cases;
-create table cases (
+create table if not exists cases (
   ecli text primary key,
   id text not null,
   title text,
@@ -18,26 +16,6 @@ create table cases (
   abstract text
 );
 """
-
-def connect_db(dbpath='caselaw.db'):
-    """Connects to the specific database."""
-    rv = sqlite3.connect(dbpath)
-    return rv
-
-
-def init_db(dbpath, filepath):
-    """
-    Initalizes the database and fills it with data.
-    NB: if the database already contains data, it will be lost!
-
-    :param dbpath: path to the database
-    :param filepath: System path to the unzipped rechtspraak.nl data
-    :return:
-    """
-    db = connect_db(dbpath)
-    db.cursor().executescript(schema)
-    db.commit()
-    fill_db(db, filepath)
 
     
 def get_session(adress):
@@ -61,7 +39,8 @@ def retrieve_ecli(ecli, db_session):
     else:
         return None
 
-def fill_db(db, filepath):
+def fill_db(db_session, filepath):
+    db_session.execute(schema)
     for dir0 in os.listdir(filepath):
         print("Processing directory", dir0)
         dir0 = os.path.join(filepath, dir0)
@@ -71,20 +50,17 @@ def fill_db(db, filepath):
                 if zipfile.is_zipfile(dir1):
                     zf = zipfile.ZipFile(dir1, 'r')
                     for n in zf.namelist():
-                        file_to_db(n, db, zf)
+                        file_to_db(n, db_session, zf)
 
-def file_to_db(filename, db, zf):
+def file_to_db(filename, db_session, zf):
     try:
-        c = db.cursor()
         ecli = filename.split('.')[0].replace('_', ':')
         # Check if ecli already exists
-        if len(c.execute(
-                'select ecli from cases where ecli=?',
-                (ecli,)).fetchall()) == 0:
+        if retrieve_ecli(ecli, db_session) is None:
             data = zf.read(filename)
             node = parse_data(data, ecli)
-            insert_node(node, c)
-            db.commit()
+            insert_node(node, db_session)
+            db_session.commit()
     except Exception as e:
         print(filename, e)
 
@@ -99,12 +75,12 @@ def parse_data(data, ecli):
     return node
 
 
-def insert_node(node, c):
-    c.execute('INSERT OR IGNORE INTO cases VALUES (?,?,?,?,?,?,?) ',
-              (node['ecli'],
-               node['id'],
-              node['title'],
-              node['creator'],
-              node['date'],
-              node['subject'],
-              node['abstract']))
+def insert_node(node, db_session):
+    db_session.execute('INSERT OR IGNORE INTO cases VALUES (:ecli,:id,:title,:creator,:date,:subject,:abstract) ',
+           {'ecli': node['ecli'],
+            'id': node['id'],
+            'title': node['title'],
+            'creator': node['creator'],
+             'date': node['date'],
+             'subject': node['subject'],
+             'abstract': node['abstract']})
