@@ -41,6 +41,7 @@ def retrieve_ecli(ecli, db_session):
 
 def fill_db(db_session, filepath):
     db_session.execute(schema)
+    db_session.commit()
     for dir0 in os.listdir(filepath):
         print("Processing directory", dir0)
         dir0 = os.path.join(filepath, dir0)
