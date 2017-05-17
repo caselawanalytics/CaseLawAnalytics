@@ -77,7 +77,7 @@ def parse_data(data, ecli):
 
 
 def insert_node(node, db_session):
-    db_session.execute('INSERT OR IGNORE INTO cases VALUES (:ecli,:id,:title,:creator,:date,:subject,:abstract) ',
+    db_session.execute('INSERT INTO cases VALUES (:ecli,:id,:title,:creator,:date,:subject,:abstract) ',
            {'ecli': node['ecli'],
             'id': node['id'],
             'title': node['title'],
