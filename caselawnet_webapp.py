@@ -44,7 +44,7 @@ def read_csv(path, sep=',', header='infer'):
 
 def save_result(data, extension):
     name = '%030x' % random.randrange(16 ** 30) + '.' + extension
-    with open(os.path.join(app.config['UPLOAD_FOLDER'], name), 'w') as fn:
+    with open(os.path.join(app.config['UPLOAD_FOLDER'], name), 'w', encoding='utf-8') as fn:
         fn.write(data)
     return name
 
