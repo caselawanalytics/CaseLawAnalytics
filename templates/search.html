@@ -4,8 +4,8 @@
         <h2>Keyword</h2>
         <dd>  <textarea  rows="1" cols="50" name="keyword"></textarea>
     {% for parameter in values %}
-        <h2>{{parameter}}</h2>
-        {% for value in values[parameter] %}
+        <h2>{{parameter[0]}}</h2>
+        {% for value in parameter[1] %}
             <input type="checkbox" name="{{parameter}}" value="{{ value.Identifier }}">{{ value.Title }}<br>
           {% endfor %}
     {% endfor %}
