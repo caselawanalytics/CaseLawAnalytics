@@ -6,7 +6,9 @@ from lxml import etree
 from . import matcher, utils, network_analysis
 
 
-def get_post_data(keyword, contentsoorten=['uitspraak'], rechtsgebieden=[], instanties=[], maximum=1000):
+def get_post_data(keyword, contentsoorten=['uitspraak'], rechtsgebieden=[], instanties=[],
+                  date_from=None, date_to=None,
+                  maximum=1000):
     # TODO: add more options
     post_data = {
         "Advanced": {
@@ -41,8 +43,26 @@ def get_post_data(keyword, contentsoorten=['uitspraak'], rechtsgebieden=[], inst
         "SortOrder": "Relevance",
         "StartRow": 0
     }
+    post_data = get_dates(post_data, date_from, date_to)
     return json.dumps(post_data)
 
+
+def get_dates(post_data, date_from, date_to):
+    if date_from is not None or date_to is not None:
+        post_data['Advanced'] = {'UitspraakdatumRange': {}}
+    if date_from is not None:
+        date_from = transform_date(date_from)
+        post_data['Advanced']['UitspraakdatumRange']['From'] = date_from
+    if date_to is not None:
+        date_from = transform_date(date_to)
+        post_data['Advanced']['UitspraakdatumRange']['To'] = date_from
+    return post_data
+
+def transform_date(date):
+    if type(date) == list:
+        date = date[0]
+    date = '-'.join(reversed(date.split('-')))
+    return date
 
 
 def get_query_result(keyword, **args):

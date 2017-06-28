@@ -2,7 +2,9 @@
 {% block search_input %}
     <form action="{{url_for('search_query')}}" method="post">
         <h2>Keyword</h2>
-        <dd>  <input type="text" name="keyword"></input>
+        <dd>  <input type="text" name="keyword"/>
+        <h2>Date</h2>
+        <dd> from <input type="date" name="date_from"> to <input type="date" name="date_to"> </dd>
     {% for parameter in values %}
         <h2>{{parameter[0]}}</h2>
         {% for value in parameter[1] %}
