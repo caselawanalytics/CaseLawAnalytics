@@ -6,7 +6,7 @@
     {% for parameter in values %}
         <h2>{{parameter[0]}}</h2>
         {% for value in parameter[1] %}
-            <input type="checkbox" name="{{parameter}}" value="{{ value.Identifier }}">{{ value.Title }}<br>
+            <input type="checkbox" name="{{parameter[0]}}" value="{{ value.Identifier }}">{{ value.Title }}<br>
           {% endfor %}
     {% endfor %}
         <dd><input type="submit" value="Search">

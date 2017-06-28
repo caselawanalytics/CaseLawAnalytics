@@ -6,7 +6,7 @@ from lxml import etree
 from . import matcher, utils, network_analysis
 
 
-def get_post_data(keyword, uitspraak_conclusie=['uitspraak'], rechtsgebieden=[], instanties=[], maximum=1000):
+def get_post_data(keyword, contentsoorten=['uitspraak'], rechtsgebieden=[], instanties=[], maximum=1000):
     # TODO: add more options
     post_data = {
         "Advanced": {
@@ -16,7 +16,7 @@ def get_post_data(keyword, uitspraak_conclusie=['uitspraak'], rechtsgebieden=[],
                            "NodeType": 7,
                            "Identifier": u,
                            "level": 1
-                           } for u in uitspraak_conclusie],
+                           } for u in contentsoorten],
         "DatumPublicatie": [],
         "DatumUitspraak": [],
         "Instanties": [{
