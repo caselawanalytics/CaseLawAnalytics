@@ -8,6 +8,8 @@
 <body>
 <div class="formpage">
     <form action="{{url_for('search_query')}}" method="post">
+        <h2>Keyword</h2>
+        <dd>  <textarea  rows="1" cols="50" name="keyword"></textarea>
     {% for parameter in values %}
         <h2>{{parameter}}</h2>
         {% for value in values[parameter] %}
@@ -16,6 +18,36 @@
     {% endfor %}
         <dd><input type="submit" value="Search">
     </form>
+
+    <div class="form">
+    <h2>Result</h2>
+        {% if nr_results != 'None'%}
+        {{nr_results}} results found.
+        {% endif %}
+        {% if nodes_file %}
+            <div class="button">
+            <form action="{{url_for('download_file', filename=nodes_file)}}">
+                <input type="submit" value="Download nodes (csv)">
+            </form>
+            </div>
+        {% endif %}
+        {% if links_file %}
+            <div class="button">
+            <form action="{{url_for('download_file', filename=links_file)}}">
+                <input type="submit" value="Download links (csv)">
+            </form>
+            </div>
+        {% endif %}
+        {% if network_file %}
+            <div class="button">
+            <form action="{{url_for('download_file', filename=network_file)}}">
+                <input type="submit" value="Download network (json)">
+            </form>
+            </div>
+        {% endif %}
+
+
+</div>
 </div>
 </body>
 </html>
