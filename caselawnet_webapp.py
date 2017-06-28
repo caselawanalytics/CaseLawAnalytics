@@ -87,35 +87,16 @@ def query_links():
         return render_template("index.html",
                                error="Sorry, something went wrong!")
 
-@app.route('/downloads/<filename>')
-def download_file(filename):
-    fn, ext = os.path.splitext(filename)
-    filename_out = 'network' + ext
+@app.route('/downloads/<filename>_<filename_out>')
+def download_file(filename, filename_out):
+    print(filename_out)
+    if filename_out is None:
+        fn, ext = os.path.splitext(filename)
+        filename_out = 'network' + ext
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename,
                                as_attachment=True,
                                attachment_filename=filename_out)
-
-@app.route('/download-json/', methods=['POST'])
-def download_json():
-    network_json = ""
-    if('network_json' in request.form):
-        network_json = request.form['network_json']
-    response = make_response(network_json)
-    response.headers[
-        "Content-Disposition"] = "attachment; filename=network_json.json"
-    return response
-
-
-@app.route('/download-csv/', methods=['POST'])
-def download_csv():
-    network_csv = ""
-    if('network_csv' in request.form):
-        network_csv = request.form['network_csv']
-    response = make_response(network_csv)
-    response.headers[
-        "Content-Disposition"] = "attachment; filename=network_csv.csv"
-    return response
 
 
 
@@ -127,19 +108,42 @@ def get_parameter_values():
         g._values = values
     return values
 
-#@app.route('/search/')
+@app.route('/search/')
 def search():
     values = get_parameter_values()
     return render_template('search.html',
                            values=values)
 
-#@app.route('/search_query/', methods=['POST'])
+@app.route('/search_query/', methods=['POST'])
 def search_query():
+    nodes_file = None
+    links_file = None
+    network_file = None
+    nr_results = None
     print(request.form)
     print(request.form.getlist('Instanties'))
     values = get_parameter_values()
+    form = {k.lower(): request.form.getlist(k) for k in request.form.keys()}
+    kw = form.pop('keyword', '')[0]
+    print(kw, form)
+    if kw is not '':
+        nodes = caselawnet.search_keyword(kw, **form)
+        nr_results = len(nodes)
+        if nr_results > 0:
+            nodes_csv = caselawnet.to_csv(nodes)
+            nodes_file = save_result(nodes_csv, 'csv')
+            links = caselawnet.retrieve_links(nodes)
+            nodes, links = caselawnet.get_network(nodes, links)
+            links_csv = pd.DataFrame(links).to_csv(index=False)
+            links_file = save_result(links_csv, 'csv')
+            network_json = caselawnet.to_sigma_json(nodes, links, kw)
+            network_file = save_result(network_json, 'json')
     return render_template('search.html',
-                           values=values)
+                           values=values,
+                           nodes_file=nodes_file,
+                           links_file=links_file,
+                           network_file= network_file,
+                           nr_results=nr_results)
     
 if __name__ == '__main__':
     app.run(debug=True)

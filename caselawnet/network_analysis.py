@@ -52,6 +52,7 @@ def add_network_statistics(nodes, links):
         nodeid = node['id']
         for var in statistics.keys():
             node[var] = statistics[var][nodeid]
-        node['rel_in_degree'] = node['in_degree'] / float(max(i, 1))
+        if 'in_degree' in node:
+            node['rel_in_degree'] = node['in_degree'] / float(max(i, 1))
     get_community(graph, nodes)
     return nodes

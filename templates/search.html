@@ -21,26 +21,26 @@
 
     <div class="form">
     <h2>Result</h2>
-        {% if nr_results != 'None'%}
+        {% if nr_results or nr_results==0 %}
         {{nr_results}} results found.
         {% endif %}
         {% if nodes_file %}
             <div class="button">
-            <form action="{{url_for('download_file', filename=nodes_file)}}">
+            <form action="{{url_for('download_file', filename=nodes_file, filename_out='nodes.csv')}}">
                 <input type="submit" value="Download nodes (csv)">
             </form>
             </div>
         {% endif %}
         {% if links_file %}
             <div class="button">
-            <form action="{{url_for('download_file', filename=links_file)}}">
+            <form action="{{url_for('download_file', filename=links_file, filename_out='links.csv')}}">
                 <input type="submit" value="Download links (csv)">
             </form>
             </div>
         {% endif %}
         {% if network_file %}
             <div class="button">
-            <form action="{{url_for('download_file', filename=network_file)}}">
+            <form action="{{url_for('download_file', filename=network_file, filename_out='network.json')}}">
                 <input type="submit" value="Download network (json)">
             </form>
             </div>
