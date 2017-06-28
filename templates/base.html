@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Case Law Querier</title>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">Case Law Querier</h1>
+        <div class="menu">
+            <a href="{{url_for('index')}}">Info</a>
+            <a href="{{url_for('search')}}">Search by keyword</a>
+            <a href="{{url_for('links')}}">Search by list of links</a>
+        </div>
+    </div>
+
+    <div class="content">
+
+       {% block content %}
+
+        {% endblock %}
+    </div>
+
+
+</body>
+</html>

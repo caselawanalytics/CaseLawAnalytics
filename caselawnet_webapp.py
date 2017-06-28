@@ -31,6 +31,10 @@ def close_connection(exception):
 def index():
     return render_template('index.html')
 
+@app.route('/links')
+def links():
+    return render_template('links.html')
+
 
 def read_csv(path, sep=',', header='infer'):
     links_df = pd.read_csv(path, sep=sep, header=header)
@@ -120,6 +124,7 @@ def search_query():
     links_file = None
     network_file = None
     nr_results = None
+    warning = None
     print(request.form)
     print(request.form.getlist('Instanties'))
     values = get_parameter_values()
@@ -138,12 +143,15 @@ def search_query():
             links_file = save_result(links_csv, 'csv')
             network_json = caselawnet.to_sigma_json(nodes, links, kw)
             network_file = save_result(network_json, 'json')
+    else:
+        warning = 'Keyword field is empty!'
     return render_template('search.html',
                            values=values,
                            nodes_file=nodes_file,
                            links_file=links_file,
                            network_file= network_file,
-                           nr_results=nr_results)
+                           nr_results=nr_results,
+                           warning=warning)
     
 if __name__ == '__main__':
     app.run(debug=True)

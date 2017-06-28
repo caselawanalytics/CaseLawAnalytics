@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<div class="formpage">
+{% extends "base_search.html" %}
+{% block search_input %}
     <form action="{{url_for('search_query')}}" method="post">
         <h2>Keyword</h2>
         <dd>  <textarea  rows="1" cols="50" name="keyword"></textarea>
@@ -18,9 +11,10 @@
     {% endfor %}
         <dd><input type="submit" value="Search">
     </form>
+{% endblock %}
 
-    <div class="form">
-    <h2>Result</h2>
+{% block search_result %}
+
         {% if nr_results or nr_results==0 %}
         {{nr_results}} results found.
         {% endif %}
@@ -45,9 +39,4 @@
             </form>
             </div>
         {% endif %}
-
-
-</div>
-</div>
-</body>
-</html>
+{% endblock %}

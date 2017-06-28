@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+ <div class="formpage">
+              {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
+              {% if warning %}<p class="warning"><strong>Warning:</strong> {{ warning }}{% endif %}
+        </div>
+
+        <div class="form">
+            {% block search_input %}
+            {% endblock %}
+        </div>
+
+        <div class="form">
+            <h2>Result</h2>
+            {% block search_result %}
+            {% endblock %}
+        </div>
+{% endblock %}

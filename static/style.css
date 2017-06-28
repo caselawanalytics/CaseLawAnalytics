@@ -1,16 +1,38 @@
 body {
     background: #fff;
     font-family: sans-serif;
+    margin: 0px;
 }
 
 .title {
   background-color: #222;
   height: 50px;
   padding: 20px;
+  margin: 0px;
 	position:relative;
 	z-index:2;
 	width:100%;
   color: white;
+}
+
+.menu {
+  background-color: #ccc;
+  height: 20px;
+  padding: 5px;
+	position:relative;
+	z-index:2;
+	width:100%;
+  color: black;
+}
+
+.content {
+    margin: 10px;
+}
+
+.menu a {
+  color: black;
+  padding: 2px 1px 1px 16px;
+}
 }
 
 .form {
@@ -29,7 +51,7 @@ body {
 p.error {
     background: #F0D6D6;
     z-index: 2;
-    margin: 5px;
+    margin: 0px;
 }
 
 p.warning {
