@@ -71,7 +71,7 @@ def query_links():
                 warning = "The following ECLI cases were not found: " + \
                     str(difference)
             if len(nodes) == 0:
-                return render_template("index.html",
+                return render_template("links.html",
                                        error="No resulting matches!")
             network_json = caselawnet.to_sigma_json(nodes, links, title)
             network_csv = caselawnet.to_csv(nodes)
@@ -79,7 +79,7 @@ def query_links():
             json_file = save_result(network_json, 'json')
             csv_file = save_result(network_csv, 'csv')
             print(json_file, csv_file)
-        return render_template("index.html",
+        return render_template("links.html",
                                network_json=network_json,
                                network_csv=network_csv,
                                json_file=json_file,
@@ -88,7 +88,7 @@ def query_links():
     except Exception as error:
         print(error)
         traceback.print_exc()
-        return render_template("index.html",
+        return render_template("links.html",
                                error="Sorry, something went wrong!")
 
 @app.route('/downloads/<filename>_<filename_out>')
@@ -125,33 +125,38 @@ def search_query():
     network_file = None
     nr_results = None
     warning = None
-    print(request.form)
-    print(request.form.getlist('Instanties'))
     values = get_parameter_values()
-    form = {k.lower(): request.form.getlist(k) for k in request.form.keys()}
-    kw = form.pop('keyword', '')[0]
-    print(kw, form)
-    if kw is not '':
-        nodes = caselawnet.search_keyword(kw, **form)
-        nr_results = len(nodes)
-        if nr_results > 0:
-            nodes_csv = caselawnet.to_csv(nodes)
-            nodes_file = save_result(nodes_csv, 'csv')
-            links = caselawnet.retrieve_links(nodes)
-            nodes, links = caselawnet.get_network(nodes, links)
-            links_csv = pd.DataFrame(links).to_csv(index=False)
-            links_file = save_result(links_csv, 'csv')
-            network_json = caselawnet.to_sigma_json(nodes, links, kw)
-            network_file = save_result(network_json, 'json')
-    else:
-        warning = 'Keyword field is empty!'
-    return render_template('search.html',
-                           values=values,
-                           nodes_file=nodes_file,
-                           links_file=links_file,
-                           network_file= network_file,
-                           nr_results=nr_results,
-                           warning=warning)
+
+    try:
+        form = {k.lower(): request.form.getlist(k) for k in request.form.keys()}
+        kw = form.pop('keyword', '')[0]
+        if kw is not '':
+            nodes = caselawnet.search_keyword(kw, **form)
+            nr_results = len(nodes)
+            if nr_results > 0:
+                nodes_csv = caselawnet.to_csv(nodes)
+                nodes_file = save_result(nodes_csv, 'csv')
+                links = caselawnet.retrieve_links(nodes)
+                nodes, links = caselawnet.get_network(nodes, links)
+                links_csv = pd.DataFrame(links).to_csv(index=False)
+                links_file = save_result(links_csv, 'csv')
+                network_json = caselawnet.to_sigma_json(nodes, links, kw)
+                network_file = save_result(network_json, 'json')
+        else:
+            warning = 'Keyword field is empty!'
+        return render_template('search.html',
+                               values=values,
+                               nodes_file=nodes_file,
+                               links_file=links_file,
+                               network_file= network_file,
+                               nr_results=nr_results,
+                               warning=warning)
+    except Exception as error:
+        print(error)
+        traceback.print_exc()
+        return render_template("search.html",
+                               values=values,
+                               error="Sorry, something went wrong!")
     
 if __name__ == '__main__':
     app.run(debug=True)
