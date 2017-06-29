@@ -20,6 +20,9 @@ def get_meta_data(eclis, rootpath=None, db_session=None):
 
     for ecli in eclis:
         #TODO check if its a valid ecli, otherwise throw error
+        if not utils.is_valid_ecli(ecli):
+            raise utils.InvalidECLIError(ecli)
+
         try:
             # First try database
             node = retrieve_from_db(ecli, db_session)

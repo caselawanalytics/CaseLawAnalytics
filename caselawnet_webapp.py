@@ -85,6 +85,9 @@ def query_links():
                                json_file=json_file,
                                csv_file=csv_file,
                                warning=warning)
+    except caselawnet.utils.InvalidECLIError as error:
+        return render_template("links.html",
+                               error="Invalid ecli: "+str(error))
     except Exception as error:
         print(error)
         traceback.print_exc()

@@ -20,6 +20,8 @@ def is_valid_ecli(s):
     upper_s = str.upper(s)
     return (re.match(ecli_regex, upper_s) is not None)
 
+class InvalidECLIError(Exception):
+    pass
 
 def to_d3_json(nodes, links, filename):
     with open(filename, 'w') as outfile:
