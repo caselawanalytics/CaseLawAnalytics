@@ -1,4 +1,5 @@
 import caselawnet
+import pytest
 
 def test_links_to_network_empty():
     links = []
@@ -16,11 +17,21 @@ def test_links_to_network():
 
 def test_links_to_network_invalid():
     """
-    TODO: what is the desired outcome?
+    These are invalid eclis so we should get an error
 
     """
     links = [{'source': 'NONEXISTENT_A',
               'target': 'NONEXISTENT_B'}]
+    with pytest.raises(Exception):
+        nodes, links = caselawnet.links_to_network(links)
+
+def test_links_to_network_unfound():
+    """
+    These are valid eclis that are not in rechtspraak.nl
+
+    """
+    links = [{'source': 'ECLI:PT:TRP:2017:671.14.0GAMCN.P1',
+              'target': 'ECLI:EU:C:2017:497'}]
     nodes, links = caselawnet.links_to_network(links)
     assert len(nodes) == 2
     assert len(links) == 1
