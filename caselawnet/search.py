@@ -1,9 +1,6 @@
-import pycurl
 import json
-import pandas as pd
-from io import BytesIO
-from lxml import etree
-from . import matcher, utils, network_analysis
+from . import matcher
+import httplib2
 
 
 def get_post_data(keyword, contentsoorten=['uitspraak'], rechtsgebieden=[], instanties=[],
@@ -67,21 +64,14 @@ def transform_date(date):
 
 def get_query_result(keyword, **args):
     post_data = get_post_data(keyword, **args)
-    buffer = BytesIO()
-
-    c = pycurl.Curl()
-    c.setopt(c.URL, 'https://uitspraken.rechtspraak.nl/api/zoek')
-    c.setopt(pycurl.HTTPHEADER, ['Content-Type: application/json',
-                                 'Accept: application/json'])
-    c.setopt(c.WRITEDATA, buffer)
-    c.setopt(pycurl.POST, 1)
-    c.setopt(pycurl.POSTFIELDS, post_data)
-
-    c.perform()
-    c.close()
-
-    body = buffer.getvalue()
-    result = json.loads(body.decode('utf-8'))
+    url =  'https://uitspraken.rechtspraak.nl/api/zoek'
+    # TODO: SSL certificate is unknown by httplib2
+    http = httplib2.Http(disable_ssl_certificate_validation=True)
+    headers = {'Content-Type': 'application/json',
+               'Accept': 'application/json'}
+    response, content = http.request(url, 'POST', headers=headers,
+                                     body=post_data)
+    result = json.loads(content.decode('utf-8'))
     return result
 
 

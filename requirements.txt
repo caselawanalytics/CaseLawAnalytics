@@ -5,6 +5,6 @@ pandas
 nltk
 flask
 pytest
-pycurl
+httplib2
 sqlalchemy
 python-louvain
