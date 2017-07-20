@@ -145,6 +145,7 @@ def search_query():
                 links_file = save_result(links_csv, 'csv')
                 network_json = caselawnet.to_sigma_json(nodes, links, kw)
                 network_file = save_result(network_json, 'json')
+                warning = 'The link extractor is not functional yet, the links will be incomplete.'
         else:
             warning = 'Keyword field is empty!'
         return render_template('search.html',
