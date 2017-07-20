@@ -19,7 +19,6 @@ def get_meta_data(eclis, rootpath=None, db_session=None):
     graph = Graph()
 
     for ecli in eclis:
-        #TODO check if its a valid ecli, otherwise throw error
         if not utils.is_valid_ecli(ecli):
             raise utils.InvalidECLIError(ecli)
 
@@ -81,8 +80,6 @@ def retrieve_xml_from_filesystem(ecli, rootpath):
 def retrieve_from_db(ecli, db_session):
     if db_session is not None:
         node = dbutils.retrieve_ecli(ecli, db_session)
-        if node is not None:
-            node = enrich_nodes([node], [], [])[0]
         return node
     return None
 

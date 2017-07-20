@@ -4,6 +4,7 @@ from lxml import etree
 from . import enrich, parser
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
+import json
 
 schema = """
 create table if not exists cases (
@@ -13,7 +14,10 @@ create table if not exists cases (
   creator varchar(200),
   date char(10),
   subject varchar(200),
-  abstract text
+  abstract text,
+  count_version int,
+  count_annotation int,
+  articles text
 );
 """
 
@@ -35,7 +39,9 @@ def retrieve_ecli(ecli, db_session):
     field_names = res.keys()
     results = res.fetchall()
     if len(results)>0:
-        return {field_names[i]: results[0][i] for i in range(len(field_names))}
+        result = {field_names[i]: results[0][i] for i in range(len(field_names))}
+        result['articles'] = json.loads(result['articles'])
+        return result
     else:
         return None
 
@@ -77,11 +83,15 @@ def parse_data(data, ecli):
 
 
 def insert_node(node, db_session):
-    db_session.execute('INSERT INTO cases VALUES (:ecli,:id,:title,:creator,:date,:subject,:abstract) ',
+    db_session.execute('INSERT INTO cases VALUES (:ecli,:id,:title,:creator,:date,:subject,:abstract,:count_version,:count_annotation,:articles) ',
            {'ecli': node['ecli'],
             'id': node['id'],
             'title': node['title'],
             'creator': node['creator'],
              'date': node['date'],
              'subject': node['subject'],
-             'abstract': node['abstract']})
+             'abstract': node['abstract'],
+            'count_version': node['count_version'],
+            'count_annotation': node['count_annotation'],
+            'articles': json.dumps(node['articles'])
+            },)
