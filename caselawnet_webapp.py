@@ -29,7 +29,7 @@ def close_connection(exception):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', version=caselawnet.__version__)
 
 @app.route('/links')
 def links():
