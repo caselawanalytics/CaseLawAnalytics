@@ -50,3 +50,6 @@ The app runs much quicker if it connects to a database with the parsed cases. __
 
 
 
+## Setting up a database
+The application works with [SQLAlchemy](). You can use any database as a backend for this. 
+If using MySQL, the python package [mysql=connector-python](https://dev.mysql.com/doc/connector-python/en/connector-python-installation-source.html) needs to be installed.
