@@ -1,6 +1,9 @@
 import os
 from setuptools import setup
 
+with open(os.path.join(os.path.dirname(__file__), 'caselawnet/_version.py')) as versionpy:
+    exec(versionpy.read())
+
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
