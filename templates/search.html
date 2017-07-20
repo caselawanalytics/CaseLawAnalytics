@@ -11,6 +11,8 @@
             <input type="checkbox" name="{{parameter[0]}}" value="{{ value.Identifier }}">{{ value.Title }}<br>
           {% endfor %}
     {% endfor %}
+        <h2>Limit number of results</h2>
+        <input type="number" name="maximum" value="1000" step="1"/>
         <p><input type="submit" value="Search"></p>
     </form>
 {% endblock %}

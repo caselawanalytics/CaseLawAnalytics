@@ -6,7 +6,9 @@ import httplib2
 def get_post_data(keyword, contentsoorten=['uitspraak'], rechtsgebieden=[], instanties=[],
                   date_from=None, date_to=None,
                   maximum=1000):
-    # TODO: add more options
+    if not type(maximum) == int:
+        maximum = int(maximum[0])
+
     post_data = {
         "Advanced": {
             "PublicatieStatus": "Ongedefinieerd"
@@ -64,6 +66,7 @@ def transform_date(date):
 
 def get_query_result(keyword, **args):
     post_data = get_post_data(keyword, **args)
+    print(post_data)
     url =  'https://uitspraken.rechtspraak.nl/api/zoek'
     # TODO: SSL certificate is unknown by httplib2
     http = httplib2.Http(disable_ssl_certificate_validation=True)
