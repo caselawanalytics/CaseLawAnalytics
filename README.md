@@ -1,9 +1,11 @@
 [![Build Status](https://travis-ci.org/NLeSC/CaseLawAnalytics.svg?branch=master)](https://travis-ci.org/NLeSC/CaseLawAnalytics)
+[![DOI](https://zenodo.org/badge/70590009.svg)](https://zenodo.org/badge/latestdoi/70590009)
+
 
 # CaseLawAnalytics
 This repository contains code for the case law query app: an application to query Dutch law cases and extract a network to use in the [case law visualization app](https://github.com/NLeSC/case-law-app).
 
-This code is still under development.
+If you use this software, please acknowledge by citing the DOI.
 
 Prerequisites:
 * Python 3
@@ -46,10 +48,12 @@ and run the app:
 
 `flask run`
 
-The app runs much quicker if it connects to a database with the parsed cases. __To Do__ : Document how to create this database
+The app runs much quicker if it connects to a database with the parsed cases.
 
 
 
 ## Setting up a database
 The application works with [SQLAlchemy](). You can use any database as a backend for this. 
 If using MySQL, the python package [mysql=connector-python](https://dev.mysql.com/doc/connector-python/en/connector-python-installation-source.html) needs to be installed.
+
+The script [fill_database.py](https://github.com/caselawanalytics/CaseLawAnalytics/blob/master/fill_database.py) can be used to initiate and fill the database. Adjust the settings within this file to point to the database (this should be the same location as defined in `settings.cfg`), and to the location of a downloaded version of the [Rechtspraak.nl data collection](https://www.rechtspraak.nl/Uitspraken-en-nieuws/Uitspraken/Paginas/Open-Data.aspx). 
