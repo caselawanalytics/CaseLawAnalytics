@@ -1,7 +1,7 @@
 import rdflib
 import requests
 from io import StringIO
-import json
+from lxml import etree
 import pandas as pd
 
 
@@ -9,63 +9,175 @@ def lido_url_to_ecli(url):
     return url.split('/')[-1]
 
 
-def retrieve_graph(ecli, auth=None):
-    if auth is None:
-        try:
-            auth = {}
-            filename = 'settings.cfg'
-            with open(filename) as f:
-                exec(compile(f.read(), filename, 'exec'))
-            auth['username'] = LIDO_USERNAME
-            auth['password'] = LIDO_PASSWD
-        except Exception:
-            'No valid authentication file!'
-            raise
 
-    lido_id = "http://linkeddata.overheid.nl/terms/jurisprudentie/id/" + ecli
-    url = "http://linkeddata.overheid.nl/service/get-links?id={}".format(lido_id)
-    response = requests.get(url,
-                            auth=requests.auth.HTTPBasicAuth(
-                            auth['username'], auth['password'] ))
-    xml_rdf = response.text
+class LinkExtractorParser(object):
 
-    g = rdflib.graph.Graph()
-    with StringIO(xml_rdf) as buff:
-        g.parse(buff)
-    return g
+    def __init__(self, auth=None):
+        if auth is None:
+            try:
+                auth = {}
+                filename = 'settings.cfg'
+                with open(filename) as f:
+                    exec(compile(f.read(), filename, 'exec'))
+                auth['username'] = LIDO_USERNAME
+                auth['password'] = LIDO_PASSWD
+            except Exception:
+                'No valid authentication file!'
+                raise
+        self.auth = auth
+        self.links_df = pd.DataFrame()
+
+    def get_lido_id(self, ecli):
+        return "http://linkeddata.overheid.nl/terms/jurisprudentie/id/" + ecli
+
+    def filter_legislation_links(self):
+        """
+        Filters links from case law to legislation
+        """
+        valid_target_types = ['http://linkeddata.overheid.nl/terms/Wet',
+                              'http://linkeddata.overheid.nl/terms/Artikel']
+        links_legislation = self.links_df[
+            self.links_df['target_type'].isin(valid_target_types)]
+        links_legislation = links_legislation[
+            ['source_id', 'target_id', 'target_title']]
+        links_legislation = links_legislation.drop_duplicates()
+        return links_legislation
+
+    def filter_caselaw_links(self):
+        """
+        Filters computer-extracted links between case law
+        """
+        valid_target_types = [
+            'http://linkeddata.overheid.nl/terms/Jurisprudentie']
+        links_caselaw = self.links_df[
+            self.links_df['target_type'].isin(valid_target_types)]
+        valid_link_types = [
+            'http://linkeddata.overheid.nl/terms/linktype/id/lx-referentie']
+        links_caselaw = links_caselaw[
+            links_caselaw['link_type'].isin(valid_link_types)]
+        links_caselaw = links_caselaw[['source_id', 'target_id']].drop_duplicates()
+        return links_caselaw
 
 
-def get_caselaw_references(g):
-    query = '''
-        prefix overheidrl: <http://linkeddata.overheid.nl/terms/>
-        select ?id_from ?id_to ?link_type
-        where {
-          ?id_from overheidrl:linkt ?id_to.
-          ?id_from a overheidrl:Jurisprudentie.
-          ?id_to a overheidrl:Jurisprudentie.
-          ?link overheidrl:linktVan ?id_from.
-          ?link overheidrl:linktNaar ?id_to.
-          ?link overheidrl:heeftLinktype ?link_type.
-        }
-        '''
-    links = g.query(query)
-    return pd.DataFrame(list(links), columns=['id_from', 'id_to', 'link_type'])
+class LinkExtractorXMLParser(LinkExtractorParser):
+    def __init__(self, auth=None):
+        super().__init__(auth)
+        self.xml_elements = []
 
-def get_legislation_references(g):
-    query = '''
+    def clear(self):
+        self.xml_elements = []
+
+    def load_xml(self, ecli):
+        url = "http://linkeddata.overheid.nl/service/get-links?id={}&output=xml".format(
+            self.get_lido_id(ecli))
+        response = requests.get(url,
+                                auth=requests.auth.HTTPBasicAuth(
+                                    self.auth['username'], self.auth['password']))
+        xml_text = response.text
+        self.xml_elements.append(etree.fromstring(xml_text.encode('utf8')))
+
+    def get_links_from_outgoing(self, sub_ref, source_id):
+        return {
+                'target_id': sub_ref.attrib['idref'],
+                'link_type': sub_ref.attrib['type'],
+                'source_id': source_id
+                }
+
+    def get_links_from_incoming(self, sub_ref, target_id):
+        return {
+                'source_id': sub_ref.attrib['idref'],
+                'link_type': sub_ref.attrib['type'],
+                'target_id': target_id,
+                }
+
+    def merge_links_nodes(self, links_df, nodes_df):
+        links_df = links_df.merge(nodes_df, left_on=['source_id'],
+                                  right_on=['id'], how='left')
+        links_df = links_df.rename(
+            columns={'title': 'source_title', 'type': 'source_type'})
+        links_df = links_df.drop('id', axis=1)
+        links_df = links_df.merge(nodes_df, left_on=['target_id'],
+                                  right_on=['id'], how='left')
+        links_df = links_df.rename(
+            columns={'title': 'target_title', 'type': 'target_type'})
+        links_df = links_df.drop('id', axis=1)
+        return links_df
+
+    def retrieve_all_references(self):
+        links = []
+        nodes = []
+        for el in self.xml_elements:
+            for sub in list(el.iterchildren('subject')):
+                sub_id = sub.attrib['id']
+
+                node_type = ''
+                for s in sub.iterchildren('{*}type'):
+                    # TODO: can there be multiple types?
+                    node_type = s.attrib['resourceIdentifier']
+
+                node_title = ''
+                for s in sub.iterchildren('{*}title'):
+                    # TODO: can there be multiple titles?
+                    node_title = s.text
+
+                nodes.append({'id':sub_id, 'title':node_title, 'type': node_type})
+
+                for inkomende_links in sub.iterchildren('inkomende-links'):
+                    for sub_ref in inkomende_links.iterchildren():
+                        links.append(self.get_links_from_incoming(sub_ref, sub_id))
+                for uitgaande_links in sub.iterchildren('uitgaande-links'):
+                    for sub_ref in uitgaande_links.iterchildren():
+                        links.append(self.get_links_from_outgoing(sub_ref, sub_id))
+        links_df = pd.DataFrame.from_dict(links)
+        nodes_df = pd.DataFrame.from_dict(nodes)
+        links_df =  self.merge_links_nodes(links_df, nodes_df)
+        self.links_df = links_df
+        return self.links_df
+
+
+class LinkExtractorRDFParser(LinkExtractorParser):
+
+    def __init__(self, auth=None):
+        super().__init__(auth)
+        self.graph = rdflib.Graph()
+
+    def load_rdf(self, ecli):
+        lido_id = "http://linkeddata.overheid.nl/terms/jurisprudentie/id/" + ecli
+        url = "http://linkeddata.overheid.nl/service/get-links?id={}".format(lido_id)
+        response = requests.get(url,
+                                auth=requests.auth.HTTPBasicAuth(
+                                self.auth['username'], self.auth['password'] ))
+        xml_rdf = response.text
+
+        with StringIO(xml_rdf) as buff:
+            self.graph.parse(buff)
+
+    def retrieve_all_references(self):
+        """
+        Retrieves all references with jurispudentie source
+        """
+
+        query = '''
         prefix overheidrl: <http://linkeddata.overheid.nl/terms/>
         prefix dct: <http://purl.org/dc/terms/>
-        select ?ecli ?ecliid ?wetid ?title ?linktype
+        select ?source_id ?source_identifier ?target_id ?target_identifier ?target_type ?target_title ?link_type
         where {
-          ?wetid a overheidrl:Wet.
-          ?ecliid overheidrl:linkt ?wetid.
-          ?ecliid dct:identifier ?ecli.
-          ?ecliid a overheidrl:Jurisprudentie.
-          ?link overheidrl:linktNaar ?wetid.
-          ?link overheidrl:linktVan ?ecliid.
-          ?link overheidrl:heeftLinktype ?linktype.
-          ?wetid dct:title ?title.
+          ?target_id a ?target_type.
+          ?source_id a overheidrl:Jurisprudentie.
+          ?source_id dct:identifier ?source_identifier.
+          ?target_id dct:identifier ?target_identifier.
+          ?link overheidrl:linktNaar ?target_id.
+          ?link overheidrl:linktVan ?source_id.
+          ?link overheidrl:heeftLinktype ?link_type.
+          optional{ ?target_id dct:title ?target_title.}
         }
         '''
-    leg_links = g.query(query)
-    return pd.DataFrame(list(leg_links), columns=['ecli_id', 'ecli', 'wet_id', 'title', 'type'])
+        links = self.graph.query(query)
+        links_df = pd.DataFrame(list(links),
+                                columns=['source_id', 'source_identifier',
+                                         'target_id', 'target_identifier',
+                                         'target_type', 'target_title',
+                                         'link_type'])
+        links_df = links_df.astype('str')
+        self.links_df = links_df
+        return links_df
