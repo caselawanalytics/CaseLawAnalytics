@@ -5,8 +5,42 @@ from lxml import etree
 import pandas as pd
 
 
-def lido_url_to_ecli(url):
-    return url.split('/')[-1]
+
+def get_links_articles(eclis, parser, nr_degrees=0):
+    '''
+
+    :param eclis:
+    :return:
+    '''
+    ecli_list = [ecli for ecli in eclis]
+    new_ecli_list = ecli_list
+    load_eclis = ecli_list
+    while nr_degrees >= 0:
+
+        ecli_list = new_ecli_list
+        for ecli in load_eclis:
+            parser.load_ecli(ecli)
+        parser.retrieve_all_references()
+        links_df = parser.filter_caselaw_links()
+        links_df['source_id'] = links_df['source_id'].apply(
+            parser.lido_to_ecli)
+        links_df['target_id'] = links_df['source_id'].apply(
+            parser.lido_to_ecli)
+
+        leg_df = parser.filter_legislation_links()
+        leg_df['source_id'] = leg_df['source_id'].apply(
+            parser.lido_to_ecli)
+
+        new_ecli_list = set(links_df['source_id']).union(links_df['source_id'])
+
+        load_eclis = new_ecli_list.difference(ecli_list)
+        nr_degrees -= 1
+
+    links_df = links_df[links_df['source_id'].isin(ecli_list)]
+    links_df = links_df[links_df['target_id'].isin(ecli_list)]
+    leg_df = leg_df[leg_df['source_id'].isin(ecli_list)]
+
+    return links_df, leg_df
 
 
 
@@ -27,8 +61,21 @@ class LinkExtractorParser(object):
         self.auth = auth
         self.links_df = pd.DataFrame()
 
+    def clear(self):
+        self.links_df = pd.DataFrame()
+
+    def load_ecli(self):
+        """
+        abstract method
+        :return:
+        """
+        pass
+
     def get_lido_id(self, ecli):
         return "http://linkeddata.overheid.nl/terms/jurisprudentie/id/" + ecli
+
+    def lido_to_ecli(self, lido_id):
+        return lido_id.split('/')[-1]
 
     def filter_legislation_links(self):
         """
@@ -65,9 +112,10 @@ class LinkExtractorXMLParser(LinkExtractorParser):
         self.xml_elements = []
 
     def clear(self):
+        super().clear()
         self.xml_elements = []
 
-    def load_xml(self, ecli):
+    def load_ecli(self, ecli):
         url = "http://linkeddata.overheid.nl/service/get-links?id={}&output=xml".format(
             self.get_lido_id(ecli))
         response = requests.get(url,
@@ -141,7 +189,7 @@ class LinkExtractorRDFParser(LinkExtractorParser):
         super().__init__(auth)
         self.graph = rdflib.Graph()
 
-    def load_rdf(self, ecli):
+    def load_ecli(self, ecli):
         lido_id = "http://linkeddata.overheid.nl/terms/jurisprudentie/id/" + ecli
         url = "http://linkeddata.overheid.nl/service/get-links?id={}".format(lido_id)
         response = requests.get(url,
