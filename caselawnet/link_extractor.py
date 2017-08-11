@@ -50,6 +50,10 @@ def get_links_articles(eclis, parser=None, auth=None, nr_degrees=0):
 
 class LinkExtractorParser(object):
 
+    LIDO_API_URL = 'http://linkeddata.overheid.nl/service/get-links'
+    LINKS_COLUMNS = ['link_type', 'source_id', 'target_id', 'source_title', 'source_type',
+       'target_title', 'target_type']
+
     def __init__(self, auth=None):
         if auth is None:
             try:
@@ -60,13 +64,29 @@ class LinkExtractorParser(object):
                 auth['username'] = LIDO_USERNAME
                 auth['password'] = LIDO_PASSWD
             except Exception:
-                'No valid authentication file!'
-                raise
+                raise Exception('No valid authentication file')
+
         self.auth = auth
-        self.links_df = pd.DataFrame()
+
+        # Test authorization
+        response_text = self.get_lido_response(self.LIDO_API_URL)
+
+        self.links_df = pd.DataFrame(columns=self.LINKS_COLUMNS)
+
+    def get_lido_response(self, url):
+        response = requests.get(url,
+                                auth=requests.auth.HTTPBasicAuth(
+                                    self.auth['username'],
+                                    self.auth['password']))
+        if response.status_code == 200:
+            return response.text
+        else:
+            raise Exception('LinkedData responded with code {}: {}. {}'.format(
+                response.status_code, response.reason, url))
 
     def clear(self):
-        self.links_df = pd.DataFrame()
+        self.links_df = pd.DataFrame(columns=self.LINKS_COLUMNS)
+
 
     def load_ecli(self):
         """
@@ -120,12 +140,9 @@ class LinkExtractorXMLParser(LinkExtractorParser):
         self.xml_elements = []
 
     def load_ecli(self, ecli):
-        url = "http://linkeddata.overheid.nl/service/get-links?id={}&output=xml".format(
+        url = "{}?id={}&output=xml".format(self.LIDO_API_URL,
             self.get_lido_id(ecli))
-        response = requests.get(url,
-                                auth=requests.auth.HTTPBasicAuth(
-                                    self.auth['username'], self.auth['password']))
-        xml_text = response.text
+        xml_text = self.get_lido_response(url)
         self.xml_elements.append(etree.fromstring(xml_text.encode('utf8')))
 
     def get_links_from_outgoing(self, sub_ref, source_id):
@@ -182,8 +199,9 @@ class LinkExtractorXMLParser(LinkExtractorParser):
                         links.append(self.get_links_from_outgoing(sub_ref, sub_id))
         links_df = pd.DataFrame.from_dict(links)
         nodes_df = pd.DataFrame.from_dict(nodes)
-        links_df =  self.merge_links_nodes(links_df, nodes_df)
-        self.links_df = links_df
+        if len(links_df)>0:
+            links_df =  self.merge_links_nodes(links_df, nodes_df)
+        self.links_df = pd.DataFrame(columns=self.LINKS_COLUMNS).append(links_df)
         return self.links_df
 
 
@@ -195,11 +213,8 @@ class LinkExtractorRDFParser(LinkExtractorParser):
 
     def load_ecli(self, ecli):
         lido_id = "http://linkeddata.overheid.nl/terms/jurisprudentie/id/" + ecli
-        url = "http://linkeddata.overheid.nl/service/get-links?id={}".format(lido_id)
-        response = requests.get(url,
-                                auth=requests.auth.HTTPBasicAuth(
-                                self.auth['username'], self.auth['password'] ))
-        xml_rdf = response.text
+        url = "{}?id={}".format(self.LIDO_API_URL, lido_id)
+        xml_rdf = self.get_lido_response(url)
 
         with StringIO(xml_rdf) as buff:
             self.graph.parse(buff)
