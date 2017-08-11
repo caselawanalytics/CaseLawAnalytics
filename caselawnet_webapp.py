@@ -123,7 +123,6 @@ def query_links():
 
             json_file = save_result(network_json, 'json')
             csv_file = save_result(network_csv, 'csv')
-            print(json_file, csv_file)
         return render_template("links.html",
                                network_json=network_json,
                                network_csv=network_csv,
@@ -141,7 +140,6 @@ def query_links():
 
 @app.route('/downloads/<filename>_<filename_out>')
 def download_file(filename, filename_out):
-    print(filename_out)
     if filename_out is None:
         fn, ext = os.path.splitext(filename)
         filename_out = 'network' + ext
@@ -179,12 +177,23 @@ def search_query():
         form = {k.lower(): request.form.getlist(k) for k in request.form.keys()}
         kw = form.pop('keyword', '')[0]
         if kw is not '':
+            include_links = int(form.pop('include_linked', [0])[0])
             nodes = caselawnet.search_keyword(kw, **form)
             nr_results = len(nodes)
             if nr_results > 0:
                 links = caselawnet.retrieve_links([n['ecli'] for n in nodes],
                                                   auth={'username': app.config['LIDO_USERNAME'],
-                                                        'password': app.config['LIDO_PASSWD']})
+                                                        'password': app.config['LIDO_PASSWD']},
+                                                  nr_degrees=include_links)
+                # Add the new nodes:
+                if include_links > 0:
+                    eclis = [caselawnet.utils.url_to_ecli(link['source'])
+                             for link in links]
+                    eclis += [caselawnet.utils.url_to_ecli(link['target'])
+                             for link in links]
+                    eclis = [e for e in eclis if e not in
+                             [n['ecli'] for n in nodes]]
+                    nodes += caselawnet.enrich_eclis(eclis, db_session=get_db())
                 nodes, links = caselawnet.get_network(nodes, links)
                 nodes_csv = caselawnet.to_csv(nodes)
                 nodes_file = save_result(nodes_csv, 'csv')

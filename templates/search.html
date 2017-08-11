@@ -11,8 +11,10 @@
             <input type="checkbox" name="{{parameter[0]}}" value="{{ value.Identifier }}">{{ value.Title }}<br>
           {% endfor %}
     {% endfor %}
-        <h2>Limit number of results</h2>
-        <input type="number" name="maximum" value="1000" step="1"/>
+        <h2>Search options</h2>
+        <input type="checkbox" name="include_linked" value={{1}} /> Include referenced and referring cases (NB: does not apply filters on extended network)
+        <br>
+        <input type="number" name="maximum" value="1000" step="1"/> Limit number of results
         <p><input type="submit" value="Search"></p>
     </form>
 {% endblock %}

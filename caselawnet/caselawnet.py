@@ -34,7 +34,7 @@ def enrich_eclis(eclis, rootpath=None, db_session=None):
     return nodes
 
 
-def retrieve_links(eclis, auth=None):
+def retrieve_links(eclis, auth=None, nr_degrees=0):
     """
     Retrieve references between cased from the LiDO api (http://linkeddata.overheid.nl)
     If the nodes are not yet rich (so: only ecli number),
@@ -43,7 +43,7 @@ def retrieve_links(eclis, auth=None):
     :return:
     """
     warnings.warn('The LiDO link API is not completely functional yet!', Warning)
-    links_df, articles = link_extractor.get_links_articles(eclis, auth=auth)
+    links_df, articles = link_extractor.get_links_articles(eclis, auth=auth, nr_degrees=nr_degrees)
     links = links_df.to_dict(orient='records')
     links_rich = enrich_links(links)
     # TODO: use the articles
