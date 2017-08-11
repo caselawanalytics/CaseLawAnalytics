@@ -58,7 +58,9 @@ def query_eclis():
 
             json_file = save_result(network_json, 'json')
             csv_file = save_result(network_csv, 'csv')
-            print(json_file, csv_file)
+            warning = 'The link extractor is not functional yet, the links will be incomplete.'
+            if len(links) == 0:
+                warning += '\nNo links were found!'
         return render_template("eclis.html",
                                network_json=network_json,
                                network_csv=network_csv,
@@ -191,6 +193,8 @@ def search_query():
                 network_json = caselawnet.to_sigma_json(nodes, links, kw)
                 network_file = save_result(network_json, 'json')
                 warning = 'The link extractor is not functional yet, the links will be incomplete.'
+                if len(links) == 0:
+                    warning += '\nNo links were found!'
         else:
             warning = 'Keyword field is empty!'
         return render_template('search.html',
