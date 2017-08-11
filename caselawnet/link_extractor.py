@@ -6,12 +6,14 @@ import pandas as pd
 
 
 
-def get_links_articles(eclis, parser, nr_degrees=0):
+def get_links_articles(eclis, parser=None, auth=None, nr_degrees=0):
     '''
 
     :param eclis:
     :return:
     '''
+    if parser is None:
+        parser = LinkExtractorXMLParser(auth=auth)
     ecli_list = [ecli for ecli in eclis]
     new_ecli_list = ecli_list
     load_eclis = ecli_list
@@ -24,7 +26,7 @@ def get_links_articles(eclis, parser, nr_degrees=0):
         links_df = parser.filter_caselaw_links()
         links_df['source_id'] = links_df['source_id'].apply(
             parser.lido_to_ecli)
-        links_df['target_id'] = links_df['source_id'].apply(
+        links_df['target_id'] = links_df['target_id'].apply(
             parser.lido_to_ecli)
 
         leg_df = parser.filter_legislation_links()
@@ -38,6 +40,8 @@ def get_links_articles(eclis, parser, nr_degrees=0):
 
     links_df = links_df[links_df['source_id'].isin(ecli_list)]
     links_df = links_df[links_df['target_id'].isin(ecli_list)]
+    links_df = links_df.drop_duplicates()
+    links_df.columns = ['source', 'target']
     leg_df = leg_df[leg_df['source_id'].isin(ecli_list)]
 
     return links_df, leg_df

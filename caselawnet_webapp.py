@@ -137,10 +137,12 @@ def search_query():
             nodes = caselawnet.search_keyword(kw, **form)
             nr_results = len(nodes)
             if nr_results > 0:
+                links = caselawnet.retrieve_links([n['ecli'] for n in nodes],
+                                                  auth={'username': app.config['LIDO_USERNAME'],
+                                                        'password': app.config['LIDO_PASSWD']})
+                nodes, links = caselawnet.get_network(nodes, links)
                 nodes_csv = caselawnet.to_csv(nodes)
                 nodes_file = save_result(nodes_csv, 'csv')
-                links = caselawnet.retrieve_links(nodes)
-                nodes, links = caselawnet.get_network(nodes, links)
                 links_csv = pd.DataFrame(links).to_csv(index=False)
                 links_file = save_result(links_csv, 'csv')
                 network_json = caselawnet.to_sigma_json(nodes, links, kw)
