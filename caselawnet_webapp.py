@@ -31,6 +31,49 @@ def close_connection(exception):
 def index():
     return render_template('index.html', version=caselawnet.__version__)
 
+
+@app.route('/eclis')
+def eclis():
+    return render_template('eclis.html')
+
+
+@app.route('/query_eclis', methods=['POST'])
+def query_eclis():
+    try:
+        network_json = None
+        network_csv = None
+        warning = None
+        if('eclis' in request.form):
+            eclis_csv = request.form['eclis']
+            title = request.form.get('title', 'Network')
+            eclis = [e.strip() for e in eclis_csv.splitlines()]
+            eclis = [e for e in eclis if len(e)>0]
+            nodes = caselawnet.enrich_eclis(eclis,  db_session=get_db())
+            links = caselawnet.retrieve_links(eclis,
+                                              auth={'username': app.config['LIDO_USERNAME'],
+                                                        'password': app.config['LIDO_PASSWD']})
+            nodes, links = caselawnet.get_network(nodes, links)
+            network_json = caselawnet.to_sigma_json(nodes, links, title)
+            network_csv = caselawnet.to_csv(nodes)
+
+            json_file = save_result(network_json, 'json')
+            csv_file = save_result(network_csv, 'csv')
+            print(json_file, csv_file)
+        return render_template("eclis.html",
+                               network_json=network_json,
+                               network_csv=network_csv,
+                               json_file=json_file,
+                               csv_file=csv_file,
+                               warning=warning)
+    except caselawnet.utils.InvalidECLIError as error:
+        return render_template("eclis.html",
+                               error="Invalid ecli: "+str(error))
+    except Exception as error:
+        print(error)
+        traceback.print_exc()
+        return render_template("links.html",
+                               error="Sorry, something went wrong!")
+
 @app.route('/links')
 def links():
     return render_template('links.html')

@@ -1,0 +1,30 @@
+{% extends "base_search.html" %}
+{% block search_input %}
+    <h2>Search by list of ECLI codes</h2>
+    <form action="{{ url_for('query_eclis') }}" method="post">
+    <dl>
+      <dt>Title:
+      <dd><input type="text" name="title">
+      <dt>Provide a list ECLI identifiers for the network. Each line should contain exactly one ECLI identifier.
+      <dd>  <textarea  rows="10" cols="50" class="eclis_csv" name="eclis"></textarea>
+        <dd><input type="submit" value="Search">
+    </dl>
+  </form>
+{% endblock %}
+
+{% block search_result %}
+    {% if json_file %}
+        <div class="button">
+        <form action="{{url_for('download_file', filename=json_file, filename_out='network.json')}}">
+            <input type="submit" value="Download JSON">
+        </form>
+        </div>
+    {% endif %}
+    {% if csv_file %}
+        <div class="button">
+            <form action="{{url_for('download_file', filename=csv_file, filename_out='network.csv')}}">
+                <input type="submit" value="Download CSV">
+            </form>
+        </div>
+    {% endif %}
+{% endblock %}
