@@ -206,6 +206,10 @@ class LinkExtractorXMLParser(LinkExtractorParser):
 
 
 class LinkExtractorRDFParser(LinkExtractorParser):
+    """
+    This parser uses the XML+RDF interface of LiDO.
+    This interface is considerably slower than the XML interface
+    """
 
     def __init__(self, auth=None):
         super().__init__(auth)
