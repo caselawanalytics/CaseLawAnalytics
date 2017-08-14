@@ -83,23 +83,26 @@ def search(keyword, **args):
     nodes = [result_to_node(res) for res in result['Results']]
     return nodes
 
+def ecli_to_creator(ecli):
+    return ecli.split(':')[2]
 
 def result_to_node(result):
     node = {}
     node['id'] = result['DeeplinkUrl']
     node['ecli'] = result['TitelEmphasis']
-    node['creator'] = 'Hoge Raad'  # TODO
+    # TODO - search meta data doesn't contain creator:
+    node['creator'] = ecli_to_creator(node['ecli'])
     node['title'] = result.get('Titel', node['id'])
     node['abstract'] = result.get('Tekstfragment', '')
     node['date'] = result['Publicatiedatum']
-    node['subject'] = result['Rechtsgebieden'][0]
+    node['subject'] = ','.join(result.get('Rechtsgebieden', []))
 
     matched_articles = matcher.get_articles(node['abstract'])
     node['articles'] = [art + ' ' + book for (art, book), cnt in
                         matched_articles.items()]
     node['year'] = int(node['date'].split('-')[-1])
-    node['count_version'] = len(result['Vindplaatsen'])
-    node['count_annotation'] = len([c for c in result['Vindplaatsen'] if
+    node['count_version'] = len(result.get('Vindplaatsen', []))
+    node['count_annotation'] = len([c for c in result.get('Vindplaatsen', []) if
                                     c['VindplaatsAnnotator'] != ''])
     # New:
     node['procedure'] = result['Proceduresoorten']
