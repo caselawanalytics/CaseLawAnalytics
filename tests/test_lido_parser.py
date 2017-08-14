@@ -1,4 +1,4 @@
-from caselawnet import link_extractor
+from caselawnet import lido_parser
 import json
 import pytest
 
@@ -18,27 +18,27 @@ def get_invalid_auth():
 def test_invalid_authorization():
     ecli = "ECLI:NL:HR:2015:295"
     with pytest.raises(Exception):
-        links_df, leg_df = link_extractor.get_links_articles(ecli, auth=get_invalid_auth())
+        links_df, leg_df = lido_parser.get_links_articles(ecli, auth=get_invalid_auth())
 
 def test_invalid_authorization_XMLparser():
     with pytest.raises(Exception):
-        parser = link_extractor.LinkExtractorXMLParser(auth=get_invalid_auth())
+        parser = lido_parser.LinkExtractorXMLParser(auth=get_invalid_auth())
 
 
 def test_invalid_authorization_RDFparser():
     with pytest.raises(Exception):
-        parser = link_extractor.LinkExtractorRDFParser(auth=get_invalid_auth())
+        parser = lido_parser.LinkExtractorRDFParser(auth=get_invalid_auth())
 
 def test_get_links():
     ecli = "ECLI:NL:HR:2015:295"
     auth = get_auth()
-    links_df, leg_df = link_extractor.get_links_articles([ecli], auth=auth)
+    links_df, leg_df = lido_parser.get_links_articles([ecli], auth=auth)
     assert len(links_df) == 0
 
 def test_invalid_ecli_XMLParser():
     ecli = "INVALID"
     auth = get_auth()
-    parser = link_extractor.LinkExtractorXMLParser(auth=auth)
+    parser = lido_parser.LinkExtractorXMLParser(auth=auth)
     parser.load_ecli(ecli)
     links_df = parser.retrieve_all_references()
     assert len(links_df) == 0
@@ -46,7 +46,7 @@ def test_invalid_ecli_XMLParser():
 def test_invalid_ecli_RDFParser():
     ecli = "INVALID"
     auth = get_auth()
-    parser = link_extractor.LinkExtractorRDFParser(auth=auth)
+    parser = lido_parser.LinkExtractorRDFParser(auth=auth)
     parser.load_ecli(ecli)
     links_df = parser.retrieve_all_references()
     assert len(links_df) == 0

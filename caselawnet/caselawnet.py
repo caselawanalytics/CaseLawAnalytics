@@ -2,7 +2,7 @@
 This module forms the main interface to the functionalities of caselawnet.
 """
 import warnings
-from . import search, network_analysis, enrich, utils, link_extractor
+from . import search, network_analysis, enrich, utils, lido_parser
 
 def search_keyword(keyword, **args):
     """
@@ -39,11 +39,13 @@ def retrieve_links(eclis, auth=None, nr_degrees=0):
     Retrieve references between cased from the LiDO api (http://linkeddata.overheid.nl)
     If the nodes are not yet rich (so: only ecli number),
      the metadata is retrieved as well.
-    :param eclis: either a list of ecli number or a list of rich nodes
-    :return:
+    :param eclis: a list of ECLI codes
+    :param auth: dict with 'username' and 'password' for the LiDO api
+    :param nr_degrees: Nodes that are `nr_degrees` away in network are also retrieved
+    :return: list of rich links
     """
     warnings.warn('The LiDO link API is not completely functional yet!', Warning)
-    links_df, articles = link_extractor.get_links_articles(eclis, auth=auth, nr_degrees=nr_degrees)
+    links_df, articles = lido_parser.get_links_articles(eclis, auth=auth, nr_degrees=nr_degrees)
     links = links_df.to_dict(orient='records')
     links_rich = enrich_links(links)
     # TODO: use the articles
