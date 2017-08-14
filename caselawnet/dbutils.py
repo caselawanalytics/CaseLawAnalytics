@@ -1,7 +1,7 @@
 import os
 import zipfile
 from lxml import etree
-from . import enrich, parser
+from . import enrich, rechtspraak_parser
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 import json
@@ -74,7 +74,7 @@ def file_to_db(filename, db_session, zf):
 def parse_data(data, ecli):
 
     el = etree.fromstring(data)
-    g = parser.parse_xml_element(el, ecli)
+    g = rechtspraak_parser.parse_xml_element(el, ecli)
     nodes = enrich.graph_to_nodes(g)
     if len(nodes)>1:
         print(ecli, len(nodes))

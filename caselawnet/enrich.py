@@ -2,7 +2,7 @@ import itertools
 from lxml import etree
 import os
 import re
-from . import matcher, utils, parser, dbutils
+from . import matcher, utils, rechtspraak_parser, dbutils
 import caselawnet
 import pandas as pd
 from rdflib import Graph
@@ -27,7 +27,7 @@ def get_meta_data(eclis, rootpath=None, db_session=None):
             node = retrieve_from_db(ecli, db_session)
             if node is None:
                 element = retrieve_from_any(ecli, rootpath=rootpath)
-                graph += parser.parse_xml_element(element, ecli)
+                graph += rechtspraak_parser.parse_xml_element(element, ecli)
             else :
                 print('Retrieved {} from database'.format(ecli))
                 nodes.append(node)
