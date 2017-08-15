@@ -1,5 +1,6 @@
 import networkx as nx
 from networkx.readwrite import json_graph
+import warnings
 import community
 
 def get_network(nodes, links):
@@ -21,13 +22,37 @@ def get_community(graph, nodes):
     for node in nodes:
         node['community'] = str(partition[node['id']])
 
+def get_hits(graph, max_iter=10000):
+    try:
+        hubs, authorities = nx.hits(graph, max_iter=max_iter)
+        return hubs, authorities
+    except nx.NetworkXError:
+        # It is possible that the HITS algorithm doesn't converge
+        warnings.warn('HITS algorithm did not converge!',
+                      Warning)
+        h = dict.fromkeys(graph, 1.0 / graph.number_of_nodes())
+        hubs, authorities = h, h
+        return hubs, authorities
+
+def get_pagerank(graph, max_iter=10000):
+    try:
+        pagerank = nx.pagerank(graph, max_iter=max_iter)
+        return pagerank
+    except nx.NetworkXError:
+        # It is possible that the pagerank algorithm doesn't converge
+        warnings.warn('PageRank algorithm did not converge!',
+                      Warning)
+        p = dict.fromkeys(graph, 1.0 / graph.number_of_nodes())
+        return p
+
+
 def add_network_statistics(nodes, links):
     if len(nodes)==0:
         return nodes
     graph = get_network(nodes, links)
     degree = nx.degree(graph)
     if max(degree.values()) > 0:
-        hubs, authorities = nx.hits(graph)
+        hubs, authorities = get_hits(graph)
         statistics = {
             'degree': degree,
             'in_degree': graph.in_degree(),
@@ -38,7 +63,7 @@ def add_network_statistics(nodes, links):
             'out_degree_centrality': nx.out_degree_centrality(graph),
             'betweenness_centrality': nx.betweenness_centrality(graph),
             'closeness_centrality': nx.closeness_centrality(graph),
-            'pagerank': nx.pagerank(graph),
+            'pagerank': get_pagerank(graph),
             'hubs': hubs,
             'authorities': authorities
         }
