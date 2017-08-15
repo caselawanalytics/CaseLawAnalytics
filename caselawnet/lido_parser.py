@@ -127,6 +127,8 @@ class LinkExtractorParser(object):
         links_caselaw = links_caselaw[
             links_caselaw['link_type'].isin(valid_link_types)]
         links_caselaw = links_caselaw[['source_id', 'target_id']].drop_duplicates()
+        # Filter self-referenes
+        links_caselaw = links_caselaw[links_caselaw['source_id'] != links_caselaw['target_id']]
         return links_caselaw
 
 

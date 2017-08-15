@@ -194,6 +194,7 @@ def search_query():
                     eclis = [e for e in eclis if e not in
                              [n['ecli'] for n in nodes]]
                     nodes += caselawnet.enrich_eclis(eclis, db_session=get_db())
+                    nr_results = len(nodes)
                 nodes, links = caselawnet.get_network(nodes, links)
                 nodes_csv = caselawnet.to_csv(nodes)
                 nodes_file = save_result(nodes_csv, 'csv')

@@ -1,19 +1,16 @@
 """
 A simple parser that retrieves rechtspraak.nl XML files,
-can parse them and upload them to the blazegraph SPARQL point.
+parses them as RDF triples.
 
 TODO: handle exceptions better
 """
 
-import os
-from lxml import etree
+
 import re
 from rdflib import Graph
 import rdflib
 import urllib.parse
 from rdflib.namespace import DCTERMS, RDFS
-
-
 
 
 ##################################
