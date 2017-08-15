@@ -40,8 +40,9 @@ def eclis():
 @app.route('/query_eclis', methods=['POST'])
 def query_eclis():
     try:
-        network_json = None
-        network_csv = None
+        nodes_file = None
+        links_file = None
+        network_file = None
         warning = None
         if('eclis' in request.form):
             eclis_csv = request.form['eclis']
@@ -53,19 +54,20 @@ def query_eclis():
                                               auth={'username': app.config['LIDO_USERNAME'],
                                                         'password': app.config['LIDO_PASSWD']})
             nodes, links = caselawnet.get_network(nodes, links)
-            network_json = caselawnet.to_sigma_json(nodes, links, title)
-            network_csv = caselawnet.to_csv(nodes)
 
-            json_file = save_result(network_json, 'json')
-            csv_file = save_result(network_csv, 'csv')
+            nodes_csv = caselawnet.to_csv(nodes)
+            nodes_file = save_result(nodes_csv, 'csv')
+            links_csv = pd.DataFrame(links).to_csv(index=False)
+            links_file = save_result(links_csv, 'csv')
+            network_json = caselawnet.to_sigma_json(nodes, links, title)
+            network_file = save_result(network_json, 'json')
             warning = 'The link extractor is not functional yet, the links will be incomplete.'
             if len(links) == 0:
                 warning += '\nNo links were found!'
         return render_template("eclis.html",
-                               network_json=network_json,
-                               network_csv=network_csv,
-                               json_file=json_file,
-                               csv_file=csv_file,
+                               network_file=network_file,
+                               nodes_file=nodes_file,
+                               links_file=links_file,
                                warning=warning)
     except caselawnet.utils.InvalidECLIError as error:
         return render_template("eclis.html",
@@ -100,8 +102,9 @@ def save_result(data, extension):
 @app.route('/query_links', methods=['POST'])
 def query_links():
     try:
-        network_json = None
-        network_csv = None
+        nodes_file = None
+        links_file = None
+        network_file = None
         warning = None
         if('links' in request.form):
             links_csv = request.form['links']
@@ -118,16 +121,16 @@ def query_links():
             if len(nodes) == 0:
                 return render_template("links.html",
                                        error="No resulting matches!")
+            nodes_csv = caselawnet.to_csv(nodes)
+            nodes_file = save_result(nodes_csv, 'csv')
+            links_csv = pd.DataFrame(links).to_csv(index=False)
+            links_file = save_result(links_csv, 'csv')
             network_json = caselawnet.to_sigma_json(nodes, links, title)
-            network_csv = caselawnet.to_csv(nodes)
-
-            json_file = save_result(network_json, 'json')
-            csv_file = save_result(network_csv, 'csv')
+            network_file = save_result(network_json, 'json')
         return render_template("links.html",
-                               network_json=network_json,
-                               network_csv=network_csv,
-                               json_file=json_file,
-                               csv_file=csv_file,
+                               network_file=network_file,
+                               nodes_file=nodes_file,
+                               links_file=links_file,
                                warning=warning)
     except caselawnet.utils.InvalidECLIError as error:
         return render_template("links.html",

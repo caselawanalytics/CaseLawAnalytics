@@ -12,19 +12,31 @@
   </form>
 {% endblock %}
 
+
 {% block search_result %}
-    {% if json_file %}
-        <div class="button">
-        <form action="{{url_for('download_file', filename=json_file, filename_out='network.json')}}">
-            <input type="submit" value="Download JSON">
-        </form>
-        </div>
-    {% endif %}
-    {% if csv_file %}
-        <div class="button">
-            <form action="{{url_for('download_file', filename=csv_file, filename_out='network.csv')}}">
-                <input type="submit" value="Download CSV">
+
+        {% if nr_results or nr_results==0 %}
+        {{nr_results}} results found.
+        {% endif %}
+        {% if nodes_file %}
+            <div class="button">
+            <form action="{{url_for('download_file', filename=nodes_file, filename_out='nodes.csv')}}">
+                <input type="submit" value="Download nodes (csv)">
             </form>
-        </div>
-    {% endif %}
+            </div>
+        {% endif %}
+        {% if links_file %}
+            <div class="button">
+            <form action="{{url_for('download_file', filename=links_file, filename_out='links.csv')}}">
+                <input type="submit" value="Download links (csv)">
+            </form>
+            </div>
+        {% endif %}
+        {% if network_file %}
+            <div class="button">
+            <form action="{{url_for('download_file', filename=network_file, filename_out='network.json')}}">
+                <input type="submit" value="Download network (json)">
+            </form>
+            </div>
+        {% endif %}
 {% endblock %}
