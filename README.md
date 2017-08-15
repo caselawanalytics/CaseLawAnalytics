@@ -16,7 +16,7 @@ The python package `caselawnet` provides the following main functionalities:
   relevant law cases.
 * Retrieve metadata from [rechtspraak.nl](https://www.rechtspraak.nl/) for a 
   list of cases (given their ECLI identifier)
-* (Future: retrieve references between cases from [LiDO](http://linkeddata.overheid.nl/front/portal/lido))
+* Retrieve references between cases from [LiDO](http://linkeddata.overheid.nl/front/portal/lido)). This requieres a valid login for the [LiDO services](http://linkeddata.overheid.nl/front/portal/services).
 * Calculate network statistics and create json file that can be used in the
   [case law visualization app](https://github.com/NLeSC/case-law-app).
 
