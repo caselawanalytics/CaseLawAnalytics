@@ -3,7 +3,7 @@ from . import matcher
 import httplib2
 from . import utils
 
-def get_post_data(keyword, contentsoorten=['uitspraak'], rechtsgebieden=[], instanties=[],
+def get_post_data(keyword, contentsoorten=[], rechtsgebieden=[], instanties=[],
                   date_from=None, date_to=None,
                   maximum=1000):
     if not type(maximum) == int:
