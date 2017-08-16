@@ -1,7 +1,7 @@
 import json
 from . import matcher
 import httplib2
-
+from . import utils
 
 def get_post_data(keyword, contentsoorten=['uitspraak'], rechtsgebieden=[], instanties=[],
                   date_from=None, date_to=None,
@@ -88,23 +88,25 @@ def ecli_to_creator(ecli):
 
 def result_to_node(result):
     node = {}
+    # Remove possible null values
+    result = {k: result[k] for k in result if result[k] is not None}
     node['id'] = result['DeeplinkUrl']
-    node['ecli'] = result['TitelEmphasis']
+    node['ecli'] = result.get('TitelEmphasis', utils.url_to_ecli(node['id']))
     # TODO - search meta data doesn't contain creator:
     node['creator'] = ecli_to_creator(node['ecli'])
-    node['title'] = result.get('Titel', node['id'])
+    node['title'] = result.get('Titel', node['ecli'])
     node['abstract'] = result.get('Tekstfragment', '')
-    node['date'] = result['Publicatiedatum']
+    node['date'] = result.get('Publicatiedatum', '')
     node['subject'] = ','.join(result.get('Rechtsgebieden', []))
 
     matched_articles = matcher.get_articles(node['abstract'])
     node['articles'] = [art + ' ' + book for (art, book), cnt in
                         matched_articles.items()]
-    node['year'] = int(node['date'].split('-')[-1])
+    node['year'] = int(node['ecli'].split(':')[3])
     node['count_version'] = len(result.get('Vindplaatsen', []))
     node['count_annotation'] = len([c for c in result.get('Vindplaatsen', []) if
                                     c['VindplaatsAnnotator'] != ''])
     # New:
-    node['procedure'] = result['Proceduresoorten']
+    node['procedure'] = result.get('Proceduresoorten', '')
     return node
 
