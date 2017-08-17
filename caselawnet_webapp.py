@@ -194,6 +194,7 @@ def search_query():
                              for link in links]
                     eclis += [caselawnet.utils.url_to_ecli(link['target'])
                              for link in links]
+                    eclis = set(eclis)
                     eclis = [e for e in eclis if e not in
                              [n['ecli'] for n in nodes]]
                     nodes += caselawnet.enrich_eclis(eclis, db_session=get_db())
