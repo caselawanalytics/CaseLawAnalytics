@@ -12,7 +12,7 @@ with open('requirements.txt') as f:
 
 setup(
     name = "caselawnet",
-    version = "0.3.1",
+    version = "0.3.2",
     description = ("Flask application for querying networks of Dutch case law"),
     license = "Apache 2.0",
     keywords = "Python",
