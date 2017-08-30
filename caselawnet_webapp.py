@@ -47,12 +47,20 @@ def query_eclis():
         if('eclis' in request.form):
             eclis_csv = request.form['eclis']
             title = request.form.get('title', 'Network')
+            include_links = int(request.form.get('include_linked', [0])[0])
             eclis = [e.strip() for e in eclis_csv.splitlines()]
             eclis = [e for e in eclis if len(e)>0]
-            nodes = caselawnet.enrich_eclis(eclis,  db_session=get_db())
             links = caselawnet.retrieve_links(eclis,
                                               auth={'username': app.config['LIDO_USERNAME'],
-                                                        'password': app.config['LIDO_PASSWD']})
+                                                        'password': app.config['LIDO_PASSWD']},
+                                              nr_degrees=include_links)
+            if include_links > 0:
+                eclis += [caselawnet.utils.url_to_ecli(link['source'])
+                         for link in links]
+                eclis += [caselawnet.utils.url_to_ecli(link['target'])
+                          for link in links]
+                eclis = set(eclis)
+            nodes = caselawnet.enrich_eclis(eclis,  db_session=get_db())
             nodes, links = caselawnet.get_network(nodes, links)
 
             nodes_csv = caselawnet.to_csv(nodes)
