@@ -33,7 +33,7 @@ def get_links_articles(eclis, parser=None, auth=None, nr_degrees=0):
         leg_df['source_id'] = leg_df['source_id'].apply(
             parser.lido_to_ecli)
 
-        new_ecli_list = set(links_df['source_id']).union(links_df['source_id'])
+        new_ecli_list = set(links_df['source_id']).union(links_df['target_id'])
 
         load_eclis = new_ecli_list.difference(ecli_list)
         nr_degrees -= 1
