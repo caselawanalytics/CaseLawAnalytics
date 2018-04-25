@@ -51,7 +51,7 @@ def add_network_statistics(nodes, links):
         return nodes
     graph = get_network(nodes, links)
     degree = nx.degree(graph)
-    if max(degree.values()) > 0:
+    if max(dict(degree).values()) > 0:
         hubs, authorities = get_hits(graph)
         statistics = {
             'degree': degree,
