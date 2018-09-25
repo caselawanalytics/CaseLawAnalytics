@@ -8,7 +8,8 @@ doi: 10.5281/zenodo.854541
 # FIXME splitting of full names is error prone, please check if given/family name are correct
 authors:
 - given-names: Dafne
-  family-names: van Kuppevelt
+  name-particle: van
+  family-names: Kuppevelt
   affiliation: Netherlands eScience Center
 version: 0.3.3
 date-released: '2017-08-30'

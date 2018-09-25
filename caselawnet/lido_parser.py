@@ -144,8 +144,15 @@ class LinkExtractorXMLParser(LinkExtractorParser):
     def load_ecli(self, ecli):
         url = "{}?id={}&output=xml".format(self.LIDO_API_URL,
             self.get_lido_id(ecli))
-        xml_text = self.get_lido_response(url)
-        self.xml_elements.append(etree.fromstring(xml_text.encode('utf8')))
+        # Get number of rows
+        xml_text_basis = self.get_lido_response(url+"&rows=0")
+        el = etree.fromstring(xml_text_basis.encode('utf8'))
+        obj_types = el.xpath("//facet[@name='obj_type']/int")
+        nr_rows = sum([int(f.text) for f in obj_types])
+        pagesize = 50
+        for start_row in range(0, nr_rows, pagesize):
+            xml_text = self.get_lido_response(url+"&rows={}&start={}".format(pagesize, start_row))
+            self.xml_elements.append(etree.fromstring(xml_text.encode('utf8')))
 
     def get_links_from_outgoing(self, sub_ref, source_id):
         return {
@@ -199,8 +206,8 @@ class LinkExtractorXMLParser(LinkExtractorParser):
                 for uitgaande_links in sub.iterchildren('uitgaande-links'):
                     for sub_ref in uitgaande_links.iterchildren():
                         links.append(self.get_links_from_outgoing(sub_ref, sub_id))
-        links_df = pd.DataFrame.from_dict(links)
-        nodes_df = pd.DataFrame.from_dict(nodes)
+        links_df = pd.DataFrame.from_dict(links).drop_duplicates()
+        nodes_df = pd.DataFrame.from_dict(nodes).drop_duplicates()
         if len(links_df)>0:
             links_df =  self.merge_links_nodes(links_df, nodes_df)
         self.links_df = pd.DataFrame(columns=self.LINKS_COLUMNS).append(links_df)
