@@ -4,15 +4,7 @@ import warnings
 import community
 
 def get_network(nodes, links):
-    edges = []
-    node_indices = {nodes[i]['id']: i for i in range(len(nodes))}
-    for link in links:
-        edge = {}
-        edge['source'] = node_indices[link['source']]
-        edge['target'] = node_indices[link['target']]
-        edge['id'] = link['id']
-        edges.append(edge)
-    graph = json_graph.node_link_graph({'nodes': nodes, 'links': edges},
+    graph = json_graph.node_link_graph({'nodes': nodes, 'links': links},
                                        directed=True, multigraph=False)
     return graph
 
@@ -51,7 +43,7 @@ def add_network_statistics(nodes, links):
         return nodes
     graph = get_network(nodes, links)
     degree = nx.degree(graph)
-    if max(degree.values()) > 0:
+    if max(dict(degree).values()) > 0:
         hubs, authorities = get_hits(graph)
         statistics = {
             'degree': degree,
