@@ -1,6 +1,8 @@
 import requests
 import json
 
+'''These functions harvest public data from hudoc.echr.coe.int.'''
+
 hudoc_base = 'https://hudoc.echr.coe.int'
 selectColumns = '&select=sharepointid,Rank,ECHRRanking,languagenumber,itemid,docname,doctype,application,appno,conclusion,importance,originatingbody,typedescription,kpdate,kpdateAsText,documentcollectionid,documentcollectionid2,languageisocode,extractedappno,isplaceholder,doctypebranch,respondent,ecli,appnoparts,sclappnos,article'
 filters = 'contentsitename:ECHR AND '
