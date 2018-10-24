@@ -141,26 +141,48 @@ def columnToNode(column):
     abstract = column['conclusion']
     date = kpdateToDate(column['kpdate'])
     year = int(date.split('-')[0])
-    subject = column['doctypebranch']
+    creator = column['doctypebranch']
+    subject = column['article']
     articles = column['article'].split(';')
-    refersTo = column['sclappnos'].split(';')
+    refersTo = list(set(column['sclappnos'].split(';') + column['extractedappno'].split(';')))
     return {
         # "id": "http://deeplink.rechtspraak.nl/uitspraak?id=" + ecli,
         "id": 'https://hudoc.echr.coe.int/eng#{"appno":["%s"]}'%appno,
         "appno": appno,
         "ecli": ecli,
-        "creator": "ECHT",
+        "creator": creator,
         "title": title,
         "abstract": abstract,
         "date": date,
         "subject": subject,
         "articles": articles,
         "year": year,
-        "refersTo": refersTo
+        "refersTo": refersTo,
+        "language": column["languageisocode"]
     }
+
+def construct_or_clause(li, s):
+    return '((' + ' OR '.join([s.format(l) for l in li]) + '))'
+
+def buildKeywordUrl(kpthesaurus_keyword, languages = ['ENG', 'FRE'], doc_types = ['JUDGMENTS', 'DECISIONS']):
+    kptVal = kpthesaurus[kpthesaurus_keyword]
+    keyword_filter = '((kpthesaurus="' + kptVal + '"))'
+    language_filter = construct_or_clause(languages, 'languageisocode="{}"')
+    doc_type_filter = construct_or_clause(doc_types, 'documentcollectionid="{}"')
+
+    filters = [keyword_filter, language_filter, doc_type_filter]
+    query = ' AND '.join(filters)
+
+    query_url = hudoc_base + '/app/query/results?sort=&start=0&length=1000&query=' + query + selectColumns
+    return query_url
+
 
 def getDataForKeyword(kpthesaurus_keyword):
     url = buildKeywordQueryUrl(kpthesaurus_keyword)
+    nodes = getDataForUrl(url)
+    return nodes
+
+def getDataForUrl(url):
     resp = requests.get(url)
     data = json.loads(resp.text)
     nodes = [ columnToNode(hit['columns']) for hit in data['results'] ]
